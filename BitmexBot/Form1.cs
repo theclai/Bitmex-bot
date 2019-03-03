@@ -292,7 +292,12 @@ namespace BitmexBot
 
                 int MA1Period = Convert.ToInt32(nudMA1.Value);
                 int MA2Period = Convert.ToInt32(nudMA2.Value);
-                RSIPeriod = Convert.ToInt32(nuRSI.Value);
+
+                int eMA1Period = Convert.ToInt32(nuEMA1.Value);
+                int eMA2Period = Convert.ToInt32(nuEMA2.Value);
+
+                int rsiUp = Convert.ToInt32(nuRSIUp.Value);
+                int rsiDown = Convert.ToInt32(nuRSIDown.Value);
 
                 if (c.PCC >= MA1Period)
                 {
@@ -328,15 +333,15 @@ namespace BitmexBot
 
 
                 // EMA
-                if (c.PCC >= EMA1Period)
+                if (c.PCC >= eMA1Period)
                 {
-                    double p1 = EMA1Period + 1;
+                    double p1 = eMA1Period + 1;
                     double EMAMultiplier = Convert.ToDouble(2 / p1);
 
-                    if (c.PCC == EMA1Period)
+                    if (c.PCC == eMA1Period)
                     {
                         // This is our seed EMA, using SMA of EMA1 Period for EMA 1
-                        c.EMA1 = Candles.Where(a => a.TimeStamp <= c.TimeStamp).OrderByDescending(a => a.TimeStamp).Take(EMA1Period).Average(a => a.Close);
+                        c.EMA1 = Candles.Where(a => a.TimeStamp <= c.TimeStamp).OrderByDescending(a => a.TimeStamp).Take(eMA1Period).Average(a => a.Close);
                     }
                     else
                     {
@@ -345,15 +350,15 @@ namespace BitmexBot
                     }
                 }
 
-                if (c.PCC >= EMA2Period)
+                if (c.PCC >= eMA2Period)
                 {
-                    double p1 = EMA2Period + 1;
+                    double p1 = eMA2Period + 1;
                     double EMAMultiplier = Convert.ToDouble(2 / p1);
 
-                    if (c.PCC == EMA2Period)
+                    if (c.PCC == eMA2Period)
                     {
                         // This is our seed EMA, using SMA
-                        c.EMA2 = Candles.Where(a => a.TimeStamp <= c.TimeStamp).OrderByDescending(a => a.TimeStamp).Take(EMA2Period).Average(a => a.Close);
+                        c.EMA2 = Candles.Where(a => a.TimeStamp <= c.TimeStamp).OrderByDescending(a => a.TimeStamp).Take(eMA2Period).Average(a => a.Close);
                     }
                     else
                     {
@@ -381,19 +386,19 @@ namespace BitmexBot
 
                 // MACD
                 // We can only do this if we have the longest EMA period, EMA1
-                if (c.PCC >= EMA1Period)
+                if (c.PCC >= eMA1Period)
                 {
 
                     double p1 = MACDEMAPeriod + 1;
                     double MACDEMAMultiplier = Convert.ToDouble(2 / p1);
 
                     c.MACDLine = (c.EMA2 - c.EMA1); // default is 12EMA - 26EMA
-                    if (c.PCC == EMA1Period + MACDEMAPeriod - 1)
+                    if (c.PCC == eMA1Period + MACDEMAPeriod - 1)
                     {
                         // Set this to SMA of MACDLine to seed it
                         c.MACDSignalLine = Candles.Where(a => a.TimeStamp <= c.TimeStamp).OrderByDescending(a => a.TimeStamp).Take(MACDEMAPeriod).Average(a => (a.MACDLine));
                     }
-                    else if (c.PCC > EMA1Period + MACDEMAPeriod - 1)
+                    else if (c.PCC > eMA1Period + MACDEMAPeriod - 1)
                     {
                         // We can calculate this EMA based off past candle EMAs
                         double? LastMACDSignalLine = Candles.Where(a => a.TimeStamp < c.TimeStamp).OrderByDescending(a => a.TimeStamp).Take(1).FirstOrDefault().MACDSignalLine;
@@ -615,30 +620,14 @@ namespace BitmexBot
 
         private void SetBotMode()
         {
+            int rsiUp = Convert.ToInt32(nuRSIUp);
+            int rsiDown = Convert.ToInt32(nuRSIDown);
+            int stochUp = Convert.ToInt32(nuStochUp);
+            int stochDown = Convert.ToInt32(nuStochDown);
+
             // This is where we are going to determine what mode the bot is in
             if (rdoBuy.Checked)
             {
-                //if ((Candles[1].MA1 > Candles[1].MA2) && (Candles[2].MA1 <= Candles[2].MA2)) // Most recently closed candle crossed over up
-                //{
-                //    // Did the last full candle have MA1 cross above MA2?  We'll need to buy now.
-                //    Mode = "Buy";
-                //}
-                //else if ((Candles[1].MA1 < Candles[1].MA2) && (Candles[2].MA1 >= Candles[2].MA2))
-                //{
-                //    // Did the last full candle have MA1 cross below MA2?  We'll need to close any open position.
-                //    Mode = "CloseAndWait";
-                //}
-                //else if ((Candles[1].MA1 > Candles[1].MA2) && (Candles[2].MA1 > Candles[2].MA2))
-                //{
-                //    // If no crossover, is MA1 still above MA2? We'll need to leave our position open.
-                //    Mode = "Wait";
-                //}
-                //else if ((Candles[1].MA1 < Candles[1].MA2) && (Candles[2].MA1 < Candles[2].MA2))
-                //{
-                //    // If no crossover, is MA1 still below MA2? We'll need to make sure we don't have a position open.
-                //    Mode = "CloseAndWait";
-                //}
-
                 // MACD Example
                 if ((Candles[1].MACDLine > Candles[1].MACDSignalLine) && (Candles[2].MACDLine <= Candles[2].MACDSignalLine)) // Most recently closed candle crossed over up
                 {
@@ -687,32 +676,104 @@ namespace BitmexBot
             }
             else if (rdoSwitch.Checked)
             {
-                //NEW
-                if ((Candles[1].MA1 > Candles[1].MA2) && (Candles[2].MA1 <= Candles[2].MA2)) // Most recently closed candle crossed over up
+                if (cbEma.Checked)
                 {
-                    // Did the last full candle have MA1 cross above MA2?  Triggers a buy in switch setting.
-                    Mode = "Buy";
+                    //NEW
+                    if ((Candles[1].EMA1 > Candles[1].EMA2) && (Candles[2].EMA1 <= Candles[2].EMA2)) // Most recently closed candle crossed over up
+                    {
+                        // Did the last full candle have MA1 cross above MA2?  Triggers a buy in switch setting.
+                        Mode = "Buy";
+                    }
+                    else if ((Candles[1].EMA1 < Candles[1].EMA2) && (Candles[2].EMA1 >= Candles[2].EMA2))
+                    {
+                        // Did the last full candle have MA1 cross below MA2?  Triggers a sell in switch setting
+                        Mode = "Sell";
+                    }
+                    else if ((Candles[1].EMA1 > Candles[1].EMA2) && (Candles[2].EMA1 > Candles[2].EMA2))
+                    {
+                        // If no crossover, is MA1 still above MA2? Keep long position open, close any shorts if they are still open.
+                        Mode = "CloseShortsAndWait";
+                    }
+                    else if ((Candles[1].EMA1 < Candles[1].EMA2) && (Candles[2].EMA1 < Candles[2].EMA2))
+                    {
+                        // If no crossover, is MA1 still below MA2? Keep short position open, close any longs if they are still open.
+                        Mode = "CloseLongsAndWait";
+                    }
                 }
-                else if ((Candles[1].MA1 > Candles[1].MA2) && (Candles[2].MA1 <= Candles[2].MA2)
-                    && (Candles[1].RSI < 30)) // Most recently closed candle crossed over up
+                if (cbEma.Checked && cbRSI.Checked)
                 {
-                    // Did the last full candle have MA1 cross above MA2?  Triggers a buy in switch setting.
-                    Mode = "Buy";
+                    //NEW
+                    if ((Candles[1].EMA1 > Candles[1].EMA2) && (Candles[2].EMA1 <= Candles[2].EMA2) && (Candles[1].RSI < rsiDown)) // Most recently closed candle crossed over up
+                    {
+                        // Did the last full candle have MA1 cross above MA2?  Triggers a buy in switch setting.
+                        Mode = "Buy";
+                    }
+                    else if ((Candles[1].EMA1 < Candles[1].EMA2) && (Candles[2].EMA1 >= Candles[2].EMA2) && (Candles[1].RSI > rsiUp))
+                    {
+                        // Did the last full candle have MA1 cross below MA2?  Triggers a sell in switch setting
+                        Mode = "Sell";
+                    }
+                    else if ((Candles[1].EMA1 > Candles[1].EMA2) && (Candles[2].EMA1 > Candles[2].EMA2))
+                    {
+                        // If no crossover, is MA1 still above MA2? Keep long position open, close any shorts if they are still open.
+                        Mode = "CloseShortsAndWait";
+                    }
+                    else if ((Candles[1].EMA1 < Candles[1].EMA2) && (Candles[2].EMA1 < Candles[2].EMA2))
+                    {
+                        // If no crossover, is MA1 still below MA2? Keep short position open, close any longs if they are still open.
+                        Mode = "CloseLongsAndWait";
+                    }
                 }
-                else if ((Candles[1].MA1 < Candles[1].MA2) && (Candles[2].MA1 >= Candles[2].MA2))
+                if (cbEma.Checked && cbRSI.Checked && cbStochastic.Checked)
                 {
-                    // Did the last full candle have MA1 cross below MA2?  Triggers a sell in switch setting
-                    Mode = "Sell";
+                    //NEW
+                    if ((Candles[1].EMA1 > Candles[1].EMA2) &&
+                        (Candles[2].EMA1 <= Candles[2].EMA2) &&
+                        (Candles[1].RSI < rsiDown) &&
+                        (Candles[1].STOCHD < stochDown)) // Most recently closed candle crossed over up
+                    {
+                        // Did the last full candle have MA1 cross above MA2?  Triggers a buy in switch setting.
+                        Mode = "Buy";
+                    }
+                    else if ((Candles[1].EMA1 < Candles[1].EMA2) && (Candles[2].EMA1 >= Candles[2].EMA2) && (Candles[1].RSI > rsiUp))
+                    {
+                        // Did the last full candle have MA1 cross below MA2?  Triggers a sell in switch setting
+                        Mode = "Sell";
+                    }
+                    else if ((Candles[1].EMA1 > Candles[1].EMA2) && (Candles[2].EMA1 > Candles[2].EMA2))
+                    {
+                        // If no crossover, is MA1 still above MA2? Keep long position open, close any shorts if they are still open.
+                        Mode = "CloseShortsAndWait";
+                    }
+                    else if ((Candles[1].EMA1 < Candles[1].EMA2) && (Candles[2].EMA1 < Candles[2].EMA2))
+                    {
+                        // If no crossover, is MA1 still below MA2? Keep short position open, close any longs if they are still open.
+                        Mode = "CloseLongsAndWait";
+                    }
                 }
-                else if ((Candles[1].MA1 > Candles[1].MA2) && (Candles[2].MA1 > Candles[2].MA2))
+                else
                 {
-                    // If no crossover, is MA1 still above MA2? Keep long position open, close any shorts if they are still open.
-                    Mode = "CloseShortsAndWait";
-                }
-                else if ((Candles[1].MA1 < Candles[1].MA2) && (Candles[2].MA1 < Candles[2].MA2))
-                {
-                    // If no crossover, is MA1 still below MA2? Keep short position open, close any longs if they are still open.
-                    Mode = "CloseLongsAndWait";
+                    //NEW
+                    if ((Candles[1].MA1 > Candles[1].MA2) && (Candles[2].MA1 <= Candles[2].MA2)) // Most recently closed candle crossed over up
+                    {
+                        // Did the last full candle have MA1 cross above MA2?  Triggers a buy in switch setting.
+                        Mode = "Buy";
+                    }
+                    else if ((Candles[1].MA1 < Candles[1].MA2) && (Candles[2].MA1 >= Candles[2].MA2))
+                    {
+                        // Did the last full candle have MA1 cross below MA2?  Triggers a sell in switch setting
+                        Mode = "Sell";
+                    }
+                    else if ((Candles[1].MA1 > Candles[1].MA2) && (Candles[2].MA1 > Candles[2].MA2))
+                    {
+                        // If no crossover, is MA1 still above MA2? Keep long position open, close any shorts if they are still open.
+                        Mode = "CloseShortsAndWait";
+                    }
+                    else if ((Candles[1].MA1 < Candles[1].MA2) && (Candles[2].MA1 < Candles[2].MA2))
+                    {
+                        // If no crossover, is MA1 still below MA2? Keep short position open, close any longs if they are still open.
+                        Mode = "CloseLongsAndWait";
+                    }
                 }
             }
         }
@@ -774,6 +835,7 @@ namespace BitmexBot
         {
             OpenPositions = bitmex.GetOpenPositions(ActiveInstrument.Symbol);
             OpenOrders = bitmex.GetOpenOrders(ActiveInstrument.Symbol);
+            
 
             if (chkAutoMarketTakeProfits.Checked && OpenPositions.Any() && Mode != "Sell" && Mode != "Buy") // See if we are taking profits on open positions, and have positions open and we aren't in our buy or sell periods
             {
@@ -784,6 +846,8 @@ namespace BitmexBot
                     // Make a market order to close out the position, also cancel all orders so nothing else fills if we had unfilled limit orders still open.
                     string Side = "Sell";
                     int Quantity = 0;
+                    int percentage = Convert.ToInt32(nuDiversification);
+
                     if (OpenPositions[0].CurrentQty > 0)
                     {
                         Side = "Sell";
@@ -792,7 +856,15 @@ namespace BitmexBot
                     else if (OpenPositions[0].CurrentQty < 0)
                     {
                         Side = "Buy";
-                        Quantity = Convert.ToInt32(OpenPositions[0].CurrentQty) * -1;
+
+                        if (chkDiversification.Checked)
+                        {
+                            Quantity = Convert.ToInt32(WalletBalance / percentage);
+                        }
+                        else
+                        {
+                            Quantity = Convert.ToInt32(OpenPositions[0].CurrentQty) * -1;
+                        }
                     }
                     bitmex.MarketOrder(ActiveInstrument.Symbol, Side, Quantity);
 
@@ -989,6 +1061,8 @@ namespace BitmexBot
                     case "Buy":
                         if (OpenPositions.Any())
                         {
+                            int percentage = Convert.ToInt32(nuDiversification);
+                            int qtyByPercentage = Convert.ToInt32(WalletBalance / percentage);
                             int PositionDifference = Convert.ToInt32(nudAutoQuantity.Value - OpenPositions[0].CurrentQty);
 
                             if (OpenOrders.Any())
@@ -998,7 +1072,16 @@ namespace BitmexBot
                                 {
                                     // We still have an open Sell order, cancel that order, make a new Buy order
                                     string result = bitmex.CancelAllOpenOrders(ActiveInstrument.Symbol);
-                                    AutoMakeOrder("Buy", PositionDifference);
+
+                                    if (chkDiversification.Checked)
+                                    {
+                                        AutoMakeOrder("Buy", qtyByPercentage);
+                                    }
+                                    else
+                                    {
+                                        AutoMakeOrder("Buy", PositionDifference);
+                                    }
+                                    
                                 }
                                 else if (OpenOrders.Any(a => a.Side == "Buy"))
                                 {
@@ -1011,14 +1094,22 @@ namespace BitmexBot
                                 // No open orders, make one for the difference
                                 if (PositionDifference != 0)
                                 {
-                                    AutoMakeOrder("Buy", Convert.ToInt32(PositionDifference));
+                                    if (chkDiversification.Checked)
+                                    {
+                                        AutoMakeOrder("Buy", qtyByPercentage);
+                                    }
+                                    else
+                                    {
+                                        AutoMakeOrder("Buy", Convert.ToInt32(PositionDifference));
+                                    }
                                 }
-
                             }
-
                         }
                         else
                         {
+                            int percentage = Convert.ToInt32(nuDiversification);
+                            int qtyByPercentage = Convert.ToInt32(WalletBalance / percentage);
+
                             if (OpenOrders.Any())
                             {
                                 // If we have an open order, edit it
@@ -1026,7 +1117,15 @@ namespace BitmexBot
                                 {
                                     // We still have an open Sell order, cancel that order, make a new Buy order
                                     string result = bitmex.CancelAllOpenOrders(ActiveInstrument.Symbol);
-                                    AutoMakeOrder("Buy", Convert.ToInt32(nudAutoQuantity.Value));
+
+                                    if (chkDiversification.Checked)
+                                    {
+                                        AutoMakeOrder("Buy", qtyByPercentage);
+                                    }
+                                    else
+                                    {
+                                        AutoMakeOrder("Buy", Convert.ToInt32(nudAutoQuantity.Value));
+                                    }
                                 }
                                 else if (OpenOrders.Any(a => a.Side == "Buy"))
                                 {
@@ -1036,7 +1135,14 @@ namespace BitmexBot
                             }
                             else
                             {
-                                AutoMakeOrder("Buy", Convert.ToInt32(nudAutoQuantity.Value));
+                                if (chkDiversification.Checked)
+                                {
+                                    AutoMakeOrder("Buy", qtyByPercentage);
+                                }
+                                else
+                                {
+                                    AutoMakeOrder("Buy", Convert.ToInt32(nudAutoQuantity.Value));
+                                }
                             }
                         }
                         break;
@@ -1067,9 +1173,7 @@ namespace BitmexBot
                                 {
                                     AutoMakeOrder("Sell", Convert.ToInt32(PositionDifference));
                                 }
-
                             }
-
                         }
                         else
                         {
@@ -1129,6 +1233,9 @@ namespace BitmexBot
                         // Close any open orders, close any open shorts, we've missed our chance to long.
                         if (OpenPositions.Any())
                         {
+                            int percentage = Convert.ToInt32(nuDiversification);
+                            int qtyByPercentage = Convert.ToInt32(WalletBalance / percentage);
+
                             // Now, do we have open orders?  If so, we want to make sure they are at the right price
                             if (OpenOrders.Any())
                             {
@@ -1136,6 +1243,7 @@ namespace BitmexBot
                                 {
                                     // We still have an open sell order, cancel that order, make a new buy order
                                     string result = bitmex.CancelAllOpenOrders(ActiveInstrument.Symbol);
+
                                     AutoMakeOrder("Buy", Convert.ToInt32(OpenPositions[0].CurrentQty));
                                 }
                                 else if (OpenOrders.Any(a => a.Side == "Buy"))
@@ -1381,8 +1489,6 @@ namespace BitmexBot
                 string OrderJSON = BuildBulkOrder(Orders);
                 bitmex.BulkOrder(OrderJSON);
             }
-
-
         }
 
         private string BuildBulkOrder(List<Order> Orders, bool Amend = false)
@@ -1427,8 +1533,6 @@ namespace BitmexBot
                 string OrderJSON = BuildBulkOrder(OpenOrders, true);
                 bitmex.AmendBulkOrder(OrderJSON);
             }
-
-
         }
     }
 }
