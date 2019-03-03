@@ -1,5 +1,4 @@
-﻿using BitMEX;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -8,11 +7,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using MaterialSkin;
+using MaterialSkin.Controls;
 
-namespace BitMexSampleBot
+
+namespace BitmexBot
 {
-    public partial class Form1 : Form
+    public partial class Form1 : MaterialForm
     {
+        private readonly MaterialSkinManager materialSkinManager;
 
         // IMPORTANT - Enter your API Key information below
 
@@ -45,7 +48,7 @@ namespace BitMexSampleBot
         // For EMA Indicator Periods, also used in MACD
         int EMA1Period = 26;  // Slow MACD EMA
         int EMA2Period = 12;  // Fast MACD EMA
-        int EMA3Period = 9;   
+        int EMA3Period = 9;
 
         // For MACD
         int MACDEMAPeriod = 9;  // MACD smoothing period
@@ -93,12 +96,20 @@ namespace BitMexSampleBot
         public Form1()
         {
             InitializeComponent();
+
+            // Initialize MaterialSkinManager
+            materialSkinManager = MaterialSkinManager.Instance;
+            materialSkinManager.AddFormToManage(this);
+            materialSkinManager.Theme = MaterialSkinManager.Themes.LIGHT;
+            materialSkinManager.ColorScheme = new ColorScheme(Primary.BlueGrey800, Primary.BlueGrey900, Primary.BlueGrey500, Accent.LightBlue200, TextShade.WHITE);
+
             InitializeDropdownsAndSettings();
             InitializeAPI();
             InitializeCandleArea();
             InitializeOverTime();
 
         }
+
         private void InitializeDropdownsAndSettings()
         {
             ddlNetwork.SelectedIndex = 0;
@@ -136,7 +147,7 @@ namespace BitMexSampleBot
 
         private void InitializeAPI()
         {
-            switch(ddlNetwork.SelectedItem.ToString())
+            switch (ddlNetwork.SelectedItem.ToString())
             {
                 case "TestNet":
                     bitmex = new BitMEXApi(txtAPIKey.Text, txtAPISecret.Text, TestbitmexDomain);
@@ -149,16 +160,19 @@ namespace BitMexSampleBot
             // We must do this in case symbols are different on test and real net
             GetAPIValidity(); // Validate API keys by checking and displaying account balance.
             InitializeSymbolInformation();
-            
+
         }
 
         private void InitializeSymbolInformation()
         {
-            ActiveInstruments = bitmex.GetActiveInstruments().OrderByDescending(a => a.Volume24H).ToList();
-            ddlSymbol.DataSource = ActiveInstruments;
-            ddlSymbol.DisplayMember = "Symbol";
-            ddlSymbol.SelectedIndex = 0;
-            ActiveInstrument = ActiveInstruments[0];
+            Task.Run(() =>
+            {
+                ActiveInstruments = bitmex.GetActiveInstruments().OrderByDescending(a => a.Volume24H).ToList();
+                ddlSymbol.DataSource = ActiveInstruments;
+                ddlSymbol.DisplayMember = "Symbol";
+                ddlSymbol.SelectedIndex = 0;
+                ActiveInstrument = ActiveInstruments[0];
+            });
         }
 
         private double CalculateMakerOrderPrice(string Side)
@@ -206,7 +220,7 @@ namespace BitMexSampleBot
             {
                 bitmex.CancelAllOpenOrders(ActiveInstrument.Symbol);
             }
-            switch(ddlOrderType.SelectedItem)
+            switch (ddlOrderType.SelectedItem)
             {
                 case "Limit Post Only":
                     if (Price == 0)
@@ -278,6 +292,7 @@ namespace BitMexSampleBot
 
                 int MA1Period = Convert.ToInt32(nudMA1.Value);
                 int MA2Period = Convert.ToInt32(nudMA2.Value);
+                RSIPeriod = Convert.ToInt32(nuRSI.Value);
 
                 if (c.PCC >= MA1Period)
                 {
@@ -318,7 +333,7 @@ namespace BitMexSampleBot
                     double p1 = EMA1Period + 1;
                     double EMAMultiplier = Convert.ToDouble(2 / p1);
 
-                    if(c.PCC == EMA1Period)
+                    if (c.PCC == EMA1Period)
                     {
                         // This is our seed EMA, using SMA of EMA1 Period for EMA 1
                         c.EMA1 = Candles.Where(a => a.TimeStamp <= c.TimeStamp).OrderByDescending(a => a.TimeStamp).Take(EMA1Period).Average(a => a.Close);
@@ -326,7 +341,7 @@ namespace BitMexSampleBot
                     else
                     {
                         double? LastEMA = Candles.Where(a => a.TimeStamp < c.TimeStamp).OrderByDescending(a => a.TimeStamp).Take(1).FirstOrDefault().EMA1;
-                        c.EMA1 =((c.Close - LastEMA) * EMAMultiplier) + LastEMA;
+                        c.EMA1 = ((c.Close - LastEMA) * EMAMultiplier) + LastEMA;
                     }
                 }
 
@@ -366,14 +381,14 @@ namespace BitMexSampleBot
 
                 // MACD
                 // We can only do this if we have the longest EMA period, EMA1
-                if(c.PCC >= EMA1Period)
+                if (c.PCC >= EMA1Period)
                 {
 
                     double p1 = MACDEMAPeriod + 1;
                     double MACDEMAMultiplier = Convert.ToDouble(2 / p1);
 
                     c.MACDLine = (c.EMA2 - c.EMA1); // default is 12EMA - 26EMA
-                    if(c.PCC == EMA1Period + MACDEMAPeriod - 1)
+                    if (c.PCC == EMA1Period + MACDEMAPeriod - 1)
                     {
                         // Set this to SMA of MACDLine to seed it
                         c.MACDSignalLine = Candles.Where(a => a.TimeStamp <= c.TimeStamp).OrderByDescending(a => a.TimeStamp).Take(MACDEMAPeriod).Average(a => (a.MACDLine));
@@ -388,21 +403,21 @@ namespace BitMexSampleBot
                 }
 
                 // ATR, setting TR
-                if(c.PCC == 0)
+                if (c.PCC == 0)
                 {
                     c.SetTR(c.High);
                 }
-                else if(c.PCC > 0)
+                else if (c.PCC > 0)
                 {
                     c.SetTR(Candles.Where(a => a.TimeStamp < c.TimeStamp).OrderByDescending(a => a.TimeStamp).Take(1).FirstOrDefault().Close);
                 }
 
                 // Setting ATRs
-                if(c.PCC == ATR1Period - 1)
+                if (c.PCC == ATR1Period - 1)
                 {
                     c.ATR1 = Candles.Where(a => a.TimeStamp <= c.TimeStamp).OrderByDescending(a => a.TimeStamp).Take(ATR1Period).Average(a => a.TR);
                 }
-                else if(c.PCC > ATR1Period - 1)
+                else if (c.PCC > ATR1Period - 1)
                 {
                     double p1 = ATR1Period + 1;
                     double ATR1Multiplier = Convert.ToDouble(2 / p1);
@@ -423,7 +438,7 @@ namespace BitMexSampleBot
                 }
 
                 // For RSI
-                if(c.PCC == RSIPeriod - 1)
+                if (c.PCC == RSIPeriod - 1)
                 {
                     // AVG Gain is average of just gains, for all periods, (14), not just periods with gains.  Same goes for losses but with losses.
                     c.AVGGain = Candles.Where(a => a.TimeStamp <= c.TimeStamp).OrderByDescending(a => a.TimeStamp).Where(a => a.GainOrLoss > 0).Take(RSIPeriod).Sum(a => a.GainOrLoss) / RSIPeriod;
@@ -434,43 +449,42 @@ namespace BitMexSampleBot
                 }
                 else if (c.PCC > RSIPeriod - 1)
                 {
-                    // AVG Gain is average of just gains, for all periods, (14), not just periods with gains.  Same goes for losses but with losses.
-                    c.AVGGain = Candles.Where(a => a.TimeStamp <= c.TimeStamp).OrderByDescending(a => a.TimeStamp).Where(a => a.GainOrLoss > 0).Take(RSIPeriod).Sum(a => a.GainOrLoss) / RSIPeriod;
-                    c.AVGLoss = (Candles.Where(a => a.TimeStamp <= c.TimeStamp).OrderByDescending(a => a.TimeStamp).Where(a => a.GainOrLoss < 0).Take(RSIPeriod).Sum(a => a.GainOrLoss) / RSIPeriod) * -1;
-
                     double? LastAVGGain = Candles.Where(a => a.TimeStamp < c.TimeStamp).OrderByDescending(a => a.TimeStamp).Take(1).FirstOrDefault().AVGGain;
                     double? LastAVGLoss = Candles.Where(a => a.TimeStamp < c.TimeStamp).OrderByDescending(a => a.TimeStamp).Take(1).FirstOrDefault().AVGLoss;
                     double? Gain = 0;
                     double? Loss = 0;
 
-                    if(c.GainOrLoss > 0)
+                    if (c.GainOrLoss > 0)
                     {
                         Gain = c.GainOrLoss;
                     }
                     else if (c.GainOrLoss < 0)
                     {
-                        Loss = c.GainOrLoss;
+                        Loss = c.GainOrLoss * -1;
                     }
 
-                    c.RS = (((LastAVGGain * (RSIPeriod - 1)) + Gain) / RSIPeriod) / (((LastAVGLoss * (RSIPeriod - 1)) + Loss) / RSIPeriod);
+                    c.AVGGain = (((LastAVGGain * (RSIPeriod - 1)) + Gain) / RSIPeriod);
+                    c.AVGLoss = (((LastAVGLoss * (RSIPeriod - 1)) + Loss) / RSIPeriod);
+
+                    c.RS = c.AVGGain / c.AVGLoss;
                     c.RSI = 100 - (100 / (1 + c.RS));
                 }
 
                 // For STOCH
-                if(c.PCC >= STOCHLookbackPeriod - 1)
+                if (c.PCC >= STOCHLookbackPeriod - 1)
                 {
                     double? HighInLookback = Candles.Where(a => a.TimeStamp <= c.TimeStamp).OrderByDescending(a => a.TimeStamp).Take(STOCHLookbackPeriod).Max(a => a.High);
                     double? LowInLookback = Candles.Where(a => a.TimeStamp <= c.TimeStamp).OrderByDescending(a => a.TimeStamp).Take(STOCHLookbackPeriod).Min(a => a.Low);
 
                     c.STOCHK = ((c.Close - LowInLookback) / (HighInLookback - LowInLookback)) * 100;
                 }
-                if(c.PCC >= STOCHLookbackPeriod - 1 + STOCHDPeriod) // difference of -1 and 2 is 3, to allow for the 3 period SMA required for STOCH
+                if (c.PCC >= STOCHLookbackPeriod - 1 + STOCHDPeriod) // difference of -1 and 2 is 3, to allow for the 3 period SMA required for STOCH
                 {
                     c.STOCHD = Candles.Where(a => a.TimeStamp <= c.TimeStamp).OrderByDescending(a => a.TimeStamp).Take(STOCHDPeriod).Average(a => a.STOCHK);
                 }
 
                 // For MFI
-                if(c.PCC > 0)
+                if (c.PCC > 0)
                 {
                     // This line uses a function in the candle class to set the Money Flow Change by passing the previous typical price
                     c.SetMoneyFlowChange(Candles.Where(a => a.TimeStamp < c.TimeStamp).OrderByDescending(a => a.TimeStamp).Take(1).FirstOrDefault().TypicalPrice);
@@ -480,10 +494,10 @@ namespace BitMexSampleBot
                     c.MoneyFlowChange = 0;
                 }
 
-                if(c.PCC >= MFIPeriod - 1) // We have enough candles we can actually start calculating the MFI
+                if (c.PCC >= MFIPeriod - 1) // We have enough candles we can actually start calculating the MFI
                 {
                     // Have to start with MoneyFlowRatio
-                        // Positive flow gets the sum of all the raw money flow on days where money flow change was positive, negative flow is opposite.
+                    // Positive flow gets the sum of all the raw money flow on days where money flow change was positive, negative flow is opposite.
                     double? PositiveFlow = Candles.Where(a => a.TimeStamp <= c.TimeStamp).OrderByDescending(a => a.TimeStamp).Take(MFIPeriod).Where(a => a.MoneyFlowChange > 0).Sum(a => a.RawMoneyFlow);
                     double? NegativeFlow = Candles.Where(a => a.TimeStamp <= c.TimeStamp).OrderByDescending(a => a.TimeStamp).Take(MFIPeriod).Where(a => a.MoneyFlowChange < 0).Sum(a => a.RawMoneyFlow);
 
@@ -492,7 +506,7 @@ namespace BitMexSampleBot
                     c.MFI = 100 - (100 / (1 + c.MoneyFlowRatio));
                 }
 
-                if(c.PCC == 1) // For PVT
+                if (c.PCC == 1) // For PVT
                 {
                     // We can set the first PVT
                     double? LastClose = Candles.Where(a => a.TimeStamp < c.TimeStamp).OrderByDescending(a => a.TimeStamp).Take(1).FirstOrDefault().Close;
@@ -507,12 +521,12 @@ namespace BitMexSampleBot
                 }
 
                 // For WMA
-                if(c.PCC >= WMAPeriod1)
+                if (c.PCC >= WMAPeriod1)
                 {
                     double? Total = 0;
                     double? WMATot = 0;
 
-                    for(int i = 0; i < WMAPeriod1; i++)
+                    for (int i = 0; i < WMAPeriod1; i++)
                     {
                         // Add the closing cost of the nth item back times n + 1 (i = n)..... 
                         Total += (Candles.Where(a => a.TimeStamp <= c.TimeStamp).OrderByDescending(a => a.TimeStamp).Take(WMAPeriod1).Skip(i).FirstOrDefault().Close * (WMAPeriod1 - i));
@@ -560,7 +574,7 @@ namespace BitMexSampleBot
                 if (c.PCC >= ALMAPeriod)
                 {
                     double m = Convert.ToDouble(Math.Floor(Convert.ToDecimal((ALMAOffset * (ALMAPeriod - 1)))));
-                    double s = Convert.ToDouble(ALMAPeriod/ALMASigma);
+                    double s = Convert.ToDouble(ALMAPeriod / ALMASigma);
 
                     double? Total = 0;
                     double? WMATot = 0;
@@ -583,19 +597,16 @@ namespace BitMexSampleBot
                 double? CumulativeVolume = Candles.Where(a => a.TimeStamp <= c.TimeStamp).OrderByDescending(a => a.TimeStamp).Take(VWAPPeriod).Sum(a => a.Volume);
 
                 c.VWAP = CumulativeTypicalPriceVolume / CumulativeVolume;
-
-
-
             }
 
             Candles = Candles.OrderByDescending(a => a.TimeStamp).ToList();
 
-            // Show Candles
-            dgvCandles.DataSource = Candles;
+            //// Show Candles
+            //dgvCandles.DataSource = Candles;
 
             // This is where we are going to determine the "mode" of the bot based on MAs, trades happen on another timer
-            if(Running)//We could set this up to also ignore setting bot mode if we've already reviewed current candles
-                            //  However, if you wanted to use info from the most current candle, that wouldn't work well
+            if (Running)//We could set this up to also ignore setting bot mode if we've already reviewed current candles
+                        //  However, if you wanted to use info from the most current candle, that wouldn't work well
             {
                 SetBotMode();  // We really only need to set bot mode if the bot is running
                 btnAutomatedTrading.Text = "Stop - " + Mode;// so we can see what the mode of the bot is while running
@@ -605,7 +616,7 @@ namespace BitMexSampleBot
         private void SetBotMode()
         {
             // This is where we are going to determine what mode the bot is in
-            if(rdoBuy.Checked)
+            if (rdoBuy.Checked)
             {
                 //if ((Candles[1].MA1 > Candles[1].MA2) && (Candles[2].MA1 <= Candles[2].MA2)) // Most recently closed candle crossed over up
                 //{
@@ -651,7 +662,7 @@ namespace BitMexSampleBot
                 }
 
             }
-            else if(rdoSell.Checked)
+            else if (rdoSell.Checked)
             {
                 if ((Candles[1].MA1 > Candles[1].MA2) && (Candles[2].MA1 <= Candles[2].MA2)) // Most recently closed candle crossed over up
                 {
@@ -674,10 +685,16 @@ namespace BitMexSampleBot
                     Mode = "Wait";
                 }
             }
-            else if(rdoSwitch.Checked)
+            else if (rdoSwitch.Checked)
             {
                 //NEW
                 if ((Candles[1].MA1 > Candles[1].MA2) && (Candles[2].MA1 <= Candles[2].MA2)) // Most recently closed candle crossed over up
+                {
+                    // Did the last full candle have MA1 cross above MA2?  Triggers a buy in switch setting.
+                    Mode = "Buy";
+                }
+                else if ((Candles[1].MA1 > Candles[1].MA2) && (Candles[2].MA1 <= Candles[2].MA2)
+                    && (Candles[1].RSI < 30)) // Most recently closed candle crossed over up
                 {
                     // Did the last full candle have MA1 cross above MA2?  Triggers a buy in switch setting.
                     Mode = "Buy";
@@ -702,16 +719,18 @@ namespace BitMexSampleBot
 
         private void tmrCandleUpdater_Tick(object sender, EventArgs e)
         {
-            if(chkUpdateCandles.Checked)
+            if (chkUpdateCandles.Checked)
             {
-                UpdateCandles();
+                Task.Run(() => 
+                {
+                    UpdateCandles();
+                });
             }
-            
         }
 
         private void chkUpdateCandles_CheckedChanged(object sender, EventArgs e)
         {
-            if(chkUpdateCandles.Checked)
+            if (chkUpdateCandles.Checked)
             {
                 tmrCandleUpdater.Start();
             }
@@ -728,7 +747,7 @@ namespace BitMexSampleBot
 
         private void btnAutomatedTrading_Click(object sender, EventArgs e)
         {
-            if(btnAutomatedTrading.Text == "Start")
+            if (btnAutomatedTrading.Text == "Start")
             {
                 tmrAutoTradeExecution.Start();
                 btnAutomatedTrading.Text = "Stop - " + Mode;
@@ -746,9 +765,9 @@ namespace BitMexSampleBot
                 Running = false;
                 rdoBuy.Enabled = true;
                 rdoSell.Enabled = true;
-                rdoSwitch.Enabled = true; 
+                rdoSwitch.Enabled = true;
             }
-            
+
         }
 
         private void tmrAutoTradeExecution_Tick(object sender, EventArgs e)
@@ -756,7 +775,7 @@ namespace BitMexSampleBot
             OpenPositions = bitmex.GetOpenPositions(ActiveInstrument.Symbol);
             OpenOrders = bitmex.GetOpenOrders(ActiveInstrument.Symbol);
 
-            if(chkAutoMarketTakeProfits.Checked && OpenPositions.Any() && Mode != "Sell" && Mode != "Buy") // See if we are taking profits on open positions, and have positions open and we aren't in our buy or sell periods
+            if (chkAutoMarketTakeProfits.Checked && OpenPositions.Any() && Mode != "Sell" && Mode != "Buy") // See if we are taking profits on open positions, and have positions open and we aren't in our buy or sell periods
             {
                 lblAutoUnrealizedROEPercent.Text = Math.Round((Convert.ToDouble(OpenPositions[0].UnrealisedRoePcnt * 100)), 2).ToString();
                 // Did we meet our profit threshold yet?
@@ -765,7 +784,7 @@ namespace BitMexSampleBot
                     // Make a market order to close out the position, also cancel all orders so nothing else fills if we had unfilled limit orders still open.
                     string Side = "Sell";
                     int Quantity = 0;
-                    if(OpenPositions[0].CurrentQty > 0)
+                    if (OpenPositions[0].CurrentQty > 0)
                     {
                         Side = "Sell";
                         Quantity = Convert.ToInt32(OpenPositions[0].CurrentQty);
@@ -782,17 +801,17 @@ namespace BitMexSampleBot
                     OpenOrders = bitmex.GetOpenOrders(ActiveInstrument.Symbol);
                 }
             }
-            
-            if(rdoBuy.Checked)
+
+            if (rdoBuy.Checked)
             {
-                switch(Mode)
+                switch (Mode)
                 {
                     case "Buy":
                         // See if we already have a position open
-                        if(OpenPositions.Any())
+                        if (OpenPositions.Any())
                         {
                             // We have an open position, is it at our desired quantity?
-                            if(OpenPositions[0].CurrentQty < nudAutoQuantity.Value)
+                            if (OpenPositions[0].CurrentQty < nudAutoQuantity.Value)
                             {
                                 // If we have an open order, edit it
                                 if (OpenOrders.Any(a => a.Side == "Sell"))
@@ -806,12 +825,12 @@ namespace BitMexSampleBot
                                     // Edit our only open order, code should not allow for more than 1 at a time for now
                                     string result = bitmex.EditOrderPrice(OpenOrders[0].OrderId, CalculateMakerOrderPrice("Buy"));
                                 }
-                                    
+
                             } // No else, it is filled to where we want.
                         }
                         else
                         {
-                            if(OpenOrders.Any())
+                            if (OpenOrders.Any())
                             {
                                 // If we have an open order, edit it
                                 if (OpenOrders.Any(a => a.Side == "Sell"))
@@ -834,23 +853,23 @@ namespace BitMexSampleBot
                         break;
                     case "CloseAndWait":
                         // See if we have open positions, if so, close them
-                        if(OpenPositions.Any())
+                        if (OpenPositions.Any())
                         {
                             // Now, do we have open orders?  If so, we want to make sure they are at the right price
                             if (OpenOrders.Any())
                             {
-                                if(OpenOrders.Any(a => a.Side == "Buy"))
+                                if (OpenOrders.Any(a => a.Side == "Buy"))
                                 {
                                     // We still have an open buy order, cancel that order, make a new sell order
                                     string result = bitmex.CancelAllOpenOrders(ActiveInstrument.Symbol);
                                     AutoMakeOrder("Sell", Convert.ToInt32(OpenPositions[0].CurrentQty));
                                 }
-                                else if(OpenOrders.Any(a => a.Side == "Sell"))
+                                else if (OpenOrders.Any(a => a.Side == "Sell"))
                                 {
                                     // Edit our only open order, code should not allow for more than 1 at a time for now
                                     string result = bitmex.EditOrderPrice(OpenOrders[0].OrderId, CalculateMakerOrderPrice("Sell"));
                                 }
-                                        
+
                             }
                             else
                             {
@@ -858,7 +877,7 @@ namespace BitMexSampleBot
                                 AutoMakeOrder("Sell", Convert.ToInt32(OpenPositions[0].CurrentQty));
                             }
                         }
-                        else if(OpenOrders.Any())
+                        else if (OpenOrders.Any())
                         {
                             // We don't have an open position, but we do have an open order, close that order, we don't want to open any position here.
                             string result = bitmex.CancelAllOpenOrders(ActiveInstrument.Symbol);
@@ -873,7 +892,7 @@ namespace BitMexSampleBot
                         break;
                 }
             }
-            else if(rdoSell.Checked)
+            else if (rdoSell.Checked)
             {
                 switch (Mode)
                 {
@@ -963,40 +982,40 @@ namespace BitMexSampleBot
                         break;
                 }
             }
-            else if(rdoSwitch.Checked)
+            else if (rdoSwitch.Checked)
             {
-                switch(Mode)
+                switch (Mode)
                 {
                     case "Buy":
                         if (OpenPositions.Any())
                         {
                             int PositionDifference = Convert.ToInt32(nudAutoQuantity.Value - OpenPositions[0].CurrentQty);
-                                
-                                if (OpenOrders.Any())
+
+                            if (OpenOrders.Any())
+                            {
+                                // If we have an open order, edit it
+                                if (OpenOrders.Any(a => a.Side == "Sell"))
                                 {
-                                    // If we have an open order, edit it
-                                    if (OpenOrders.Any(a => a.Side == "Sell"))
-                                    {
-                                        // We still have an open Sell order, cancel that order, make a new Buy order
-                                        string result = bitmex.CancelAllOpenOrders(ActiveInstrument.Symbol);
-                                        AutoMakeOrder("Buy", PositionDifference);
-                                    }
-                                    else if (OpenOrders.Any(a => a.Side == "Buy"))
-                                    {
-                                        // Edit our only open order, code should not allow for more than 1 at a time for now
-                                        string result = bitmex.EditOrderPrice(OpenOrders[0].OrderId, CalculateMakerOrderPrice("Buy"));
-                                    }
+                                    // We still have an open Sell order, cancel that order, make a new Buy order
+                                    string result = bitmex.CancelAllOpenOrders(ActiveInstrument.Symbol);
+                                    AutoMakeOrder("Buy", PositionDifference);
                                 }
-                                else
+                                else if (OpenOrders.Any(a => a.Side == "Buy"))
                                 {
-                                    // No open orders, make one for the difference
-                                    if(PositionDifference != 0)
-                                    {
-                                        AutoMakeOrder("Buy", Convert.ToInt32(PositionDifference));
-                                    }
-                                    
+                                    // Edit our only open order, code should not allow for more than 1 at a time for now
+                                    string result = bitmex.EditOrderPrice(OpenOrders[0].OrderId, CalculateMakerOrderPrice("Buy"));
                                 }
-                                
+                            }
+                            else
+                            {
+                                // No open orders, make one for the difference
+                                if (PositionDifference != 0)
+                                {
+                                    AutoMakeOrder("Buy", Convert.ToInt32(PositionDifference));
+                                }
+
+                            }
+
                         }
                         else
                         {
@@ -1048,7 +1067,7 @@ namespace BitMexSampleBot
                                 {
                                     AutoMakeOrder("Sell", Convert.ToInt32(PositionDifference));
                                 }
-                                
+
                             }
 
                         }
@@ -1094,7 +1113,7 @@ namespace BitMexSampleBot
                                 }
 
                             }
-                            else if(OpenPositions[0].CurrentQty > 0)
+                            else if (OpenPositions[0].CurrentQty > 0)
                             {
                                 // No open orders, need to make an order to sell
                                 AutoMakeOrder("Sell", Convert.ToInt32(OpenPositions[0].CurrentQty));
@@ -1147,20 +1166,25 @@ namespace BitMexSampleBot
         {
             try // Code is simple, if we get our account balance without an error the API is valid, if not, it will throw an error and API will be marked not valid.
             {
-                
-                WalletBalance = bitmex.GetAccountBalance();
-                if (WalletBalance >= 0)
+
+                var task = Task.Run(() =>
                 {
-                    APIValid = true;
-                    stsAPIValid.Text = "API keys are valid";
-                    stsAccountBalance.Text = "Balance: " + WalletBalance.ToString();
-                }
-                else
-                {
-                    APIValid = false;
-                    stsAPIValid.Text = "API keys are invalid";
-                    stsAccountBalance.Text = "Balance: 0";
-                }
+
+                    WalletBalance = bitmex.GetAccountBalance();
+                    if (WalletBalance >= 0)
+                    {
+                        APIValid = true;
+                        stsAPIValid.Text = "API keys are valid";
+                        stsAccountBalance.Text = "Balance: " + WalletBalance.ToString();
+                    }
+                    else
+                    {
+                        APIValid = false;
+                        stsAPIValid.Text = "API keys are invalid";
+                        stsAccountBalance.Text = "Balance: 0";
+                    }
+                });
+
             }
             catch (Exception ex)
             {
@@ -1181,10 +1205,10 @@ namespace BitMexSampleBot
         {
             OpenPositions = bitmex.GetOpenPositions(ActiveInstrument.Symbol);
 
-            if(OpenPositions.Any()) // Only set stops if we have open positions
+            if (OpenPositions.Any()) // Only set stops if we have open positions
             {
                 // Now determine what kind of stop to set
-                if(OpenPositions[0].CurrentQty > 0)
+                if (OpenPositions[0].CurrentQty > 0)
                 {
                     // Determine stop price, x percent below current price.
                     double PercentPriceDifference = Convert.ToDouble(Candles[0].Close) * (Convert.ToDouble(nudStopPercent.Value) / 100);
@@ -1194,7 +1218,7 @@ namespace BitMexSampleBot
                     // Set a stop to sell
                     bitmex.MarketStop(ActiveInstrument.Symbol, "Sell", StopPrice, Convert.ToInt32(OpenPositions[0].CurrentQty), true, ddlCandleTimes.SelectedItem.ToString());
                 }
-                else if(OpenPositions[0].CurrentQty < 0)
+                else if (OpenPositions[0].CurrentQty < 0)
                 {
                     // Determine stop price, x percent below current price.
                     double PercentPriceDifference = Convert.ToDouble(Candles[0].Close) * (Convert.ToDouble(nudStopPercent.Value) / 100);
@@ -1301,13 +1325,13 @@ namespace BitMexSampleBot
             double Percent = ((double)OTTimerCount / (double)OTIntervalCount) * 100;
             stsOTProgress.Value = Convert.ToInt32(Math.Round(Percent));
 
-            if(OTTimerCount == OTIntervalCount)
+            if (OTTimerCount == OTIntervalCount)
             {
                 OTTimerCount = 0;
                 tmrTradeOverTime.Stop();
                 stsOTProgress.Value = 0;
                 stsOTProgress.Visible = false;
-                
+
             }
         }
 
@@ -1352,13 +1376,13 @@ namespace BitMexSampleBot
             Orders.Add(Ord2);
 
 
-            if(Orders.Any())
+            if (Orders.Any())
             {
                 string OrderJSON = BuildBulkOrder(Orders);
                 bitmex.BulkOrder(OrderJSON);
             }
-            
-         
+
+
         }
 
         private string BuildBulkOrder(List<Order> Orders, bool Amend = false)
@@ -1368,14 +1392,14 @@ namespace BitMexSampleBot
             str.Append("[");
 
             int i = 1;
-            foreach(Order o in Orders)
+            foreach (Order o in Orders)
             {
-                if(i > 1)
+                if (i > 1)
                 {
                     str.Append(", ");
                 }
                 str.Append("{");
-                if(Amend == true)
+                if (Amend == true)
                 {
                     str.Append("\"orderID\": \"" + o.OrderId.ToString() + "\", ");
                 }
@@ -1404,7 +1428,7 @@ namespace BitMexSampleBot
                 bitmex.AmendBulkOrder(OrderJSON);
             }
 
-            
+
         }
     }
 }

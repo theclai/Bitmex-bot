@@ -1,5 +1,4 @@
-﻿//using ServiceStack.Text;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,7 +8,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 
-namespace BitMEX
+namespace BitmexBot
 {
     public class OrderBookItem
     {
@@ -82,7 +81,7 @@ namespace BitMEX
 
         private long GetNonce()
         {
-            DateTime yearBegin = new DateTime(1990, 1, 1);
+            DateTime yearBegin = new DateTime(2018, 8, 7);
             return DateTime.UtcNow.Ticks - yearBegin.Ticks;
         }
 
@@ -92,6 +91,15 @@ namespace BitMEX
             {
                 return hash.ComputeHash(messageBytes);
             }
+        }
+
+        public string GetExpiresArg()
+        {
+            long timestamp = (long)((DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds);
+
+            string expires = (timestamp + 60).ToString();
+
+            return (expires);
         }
 
         private string Query(string method, string function, Dictionary<string, string> param = null, bool auth = false, bool json = false)
@@ -106,11 +114,14 @@ namespace BitMEX
             if (auth)
             {
                 string nonce = GetNonce().ToString();
-                string message = method + url + nonce + postData;
+                string message2 = method + url + nonce + postData;
+                string expires = GetExpiresArg();
+                string message = method + url + expires + postData;
                 byte[] signatureBytes = hmacsha256(Encoding.UTF8.GetBytes(apiSecret), Encoding.UTF8.GetBytes(message));
                 string signatureString = ByteArrayToString(signatureBytes);
 
-                webRequest.Headers.Add("api-nonce", nonce);
+                //webRequest.Headers.Add("api-nonce", nonce);
+                webRequest.Headers.Add("api-expires", expires);
                 webRequest.Headers.Add("api-key", apiKey);
                 webRequest.Headers.Add("api-signature", signatureString);
             }
@@ -404,7 +415,7 @@ namespace BitMEX
         public double? MA2 { get; set; }
 
         public double? ALMA { get; set; } // NEW - For ALMA
-        
+
         public double? HMA { get; set; } // For HMA
 
         public double? WMA1 { get; set; }
@@ -441,7 +452,7 @@ namespace BitMEX
         public double? MoneyFlowChange { get; set; } //  For MFI // This gets set to the TypicalPrice of this candle, to the TypicalPrice of the previous candle
         public double? MFI { get; set; } //  For MFI
 
-        
+
         public double? EMA1 { get; set; }
         public double? EMA2 { get; set; }
         public double? EMA3 { get; set; }
@@ -479,7 +490,7 @@ namespace BitMEX
             TR = TRs.Max();
         }
 
-        
+
     }
 
     public class Position

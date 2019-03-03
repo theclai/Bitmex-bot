@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace BitMexSampleBot.Properties
+namespace BitmexBot.Properties
 {
 
 

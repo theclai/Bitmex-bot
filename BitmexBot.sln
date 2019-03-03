@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.136
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BitmexBot", "BitmexBot\BitmexBot.csproj", "{54800C66-548F-49AD-A26A-1FD250FB0DEE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BitmexBoConsole", "BitmexBoConsole\BitmexBoConsole.csproj", "{FBE7192E-4174-4C51-BEF3-9EC3ED24280B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{54800C66-548F-49AD-A26A-1FD250FB0DEE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{54800C66-548F-49AD-A26A-1FD250FB0DEE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{54800C66-548F-49AD-A26A-1FD250FB0DEE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{54800C66-548F-49AD-A26A-1FD250FB0DEE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FBE7192E-4174-4C51-BEF3-9EC3ED24280B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FBE7192E-4174-4C51-BEF3-9EC3ED24280B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FBE7192E-4174-4C51-BEF3-9EC3ED24280B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FBE7192E-4174-4C51-BEF3-9EC3ED24280B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7CA55E8E-15BB-46FD-8D5C-CD2B04BADC20}
+	EndGlobalSection
+EndGlobal
