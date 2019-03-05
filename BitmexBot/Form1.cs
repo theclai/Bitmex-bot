@@ -35,6 +35,7 @@ namespace BitmexBot
         List<Instrument> ActiveInstruments = new List<Instrument>();
         Instrument ActiveInstrument = new Instrument();
         List<Candle> Candles = new List<Candle>();
+        List<Candle> CandlesHistory = new List<Candle>();
 
         bool Running = false;
         string Mode = "Wait";
@@ -116,6 +117,7 @@ namespace BitmexBot
             ddlOrderType.SelectedIndex = 0;
             ddlCandleTimes.SelectedIndex = 0;
             ddlAutoOrderType.SelectedIndex = 0;
+            ddlPumpDumpTime.SelectedIndex = 0;
 
             LoadAPISettings();
         }
@@ -165,14 +167,11 @@ namespace BitmexBot
 
         private void InitializeSymbolInformation()
         {
-            Task.Run(() =>
-            {
-                ActiveInstruments = bitmex.GetActiveInstruments().OrderByDescending(a => a.Volume24H).ToList();
-                ddlSymbol.DataSource = ActiveInstruments;
-                ddlSymbol.DisplayMember = "Symbol";
-                ddlSymbol.SelectedIndex = 0;
-                ActiveInstrument = ActiveInstruments[0];
-            });
+            ActiveInstruments = bitmex.GetActiveInstruments().OrderByDescending(a => a.Volume24H).ToList();
+            ddlSymbol.DataSource = ActiveInstruments;
+            ddlSymbol.DisplayMember = "Symbol";
+            ddlSymbol.SelectedIndex = 0;
+            ActiveInstrument = ActiveInstruments[0];
         }
 
         private double CalculateMakerOrderPrice(string Side)
@@ -237,6 +236,12 @@ namespace BitmexBot
 
         private void AutoMakeOrder(string Side, int Qty, double Price = 0)
         {
+            int percentage = Convert.ToInt32(nuDiversification.Value);
+            int qtyByPercentage = percentage;
+
+            if (WalletBalance >= 1)
+                qtyByPercentage = Convert.ToInt32(WalletBalance / percentage);
+
             switch (ddlAutoOrderType.SelectedItem)
             {
                 case "Limit Post Only":
@@ -244,9 +249,20 @@ namespace BitmexBot
                     {
                         Price = CalculateMakerOrderPrice(Side);
                     }
+
+                    if (chkDiversification.Checked)
+                    {
+                        Qty = qtyByPercentage;
+                    }
+
                     var MakerBuy = bitmex.PostOrderPostOnly(ActiveInstrument.Symbol, Side, Price, Qty);
                     break;
                 case "Market":
+                    if (chkDiversification.Checked)
+                    {
+                        Qty = qtyByPercentage;
+                    }
+
                     bitmex.MarketOrder(ActiveInstrument.Symbol, Side, Qty);
                     break;
             }
@@ -280,10 +296,17 @@ namespace BitmexBot
 
         private void UpdateCandles()
         {
+            int hour = 1;
+
             // Get candles
             Candles = bitmex.GetCandleHistory(ActiveInstrument.Symbol, 500, ddlCandleTimes.SelectedItem.ToString());
-
             Candles = Candles.OrderBy(a => a.TimeStamp).ToList();
+
+            // Get candles for check pump and dump
+            CandlesHistory = bitmex.GetCandleHistory(ActiveInstrument.Symbol, 1, ddlCandleTimes.SelectedItem.ToString(), 
+                DateTime.UtcNow.AddHours(-hour), DateTime.UtcNow);
+
+            CandlesHistory = CandlesHistory.OrderBy(c => c.TimeStamp).ToList();
 
             // Set Indicator Info
             foreach (Candle c in Candles)
@@ -296,8 +319,8 @@ namespace BitmexBot
                 int eMA1Period = Convert.ToInt32(nuEMA1.Value);
                 int eMA2Period = Convert.ToInt32(nuEMA2.Value);
 
-                int rsiUp = Convert.ToInt32(nuRSIUp.Value);
-                int rsiDown = Convert.ToInt32(nuRSIDown.Value);
+                int rsiUp = Convert.ToInt32(nuRSIOverbought.Value);
+                int rsiDown = Convert.ToInt32(nuRSIOversold.Value);
 
                 if (c.PCC >= MA1Period)
                 {
@@ -611,8 +634,9 @@ namespace BitmexBot
 
             // This is where we are going to determine the "mode" of the bot based on MAs, trades happen on another timer
             if (Running)//We could set this up to also ignore setting bot mode if we've already reviewed current candles
-                        //  However, if you wanted to use info from the most current candle, that wouldn't work well
+                      //  However, if you wanted to use info from the most current candle, that wouldn't work well
             {
+                checkPumpAndDump(CandlesHistory);
                 SetBotMode();  // We really only need to set bot mode if the bot is running
                 btnAutomatedTrading.Text = "Stop - " + Mode;// so we can see what the mode of the bot is while running
             }
@@ -620,10 +644,10 @@ namespace BitmexBot
 
         private void SetBotMode()
         {
-            int rsiUp = Convert.ToInt32(nuRSIUp);
-            int rsiDown = Convert.ToInt32(nuRSIDown);
-            int stochUp = Convert.ToInt32(nuStochUp);
-            int stochDown = Convert.ToInt32(nuStochDown);
+            int rsiOverbought = Convert.ToInt32(nuRSIOverbought.Value);
+            int rsiOversold = Convert.ToInt32(nuRSIOversold.Value);
+            int stochUp = Convert.ToInt32(nuStochUp.Value);
+            int stochDown = Convert.ToInt32(nuStochDown.Value);
 
             // This is where we are going to determine what mode the bot is in
             if (rdoBuy.Checked)
@@ -703,12 +727,12 @@ namespace BitmexBot
                 if (cbEma.Checked && cbRSI.Checked)
                 {
                     //NEW
-                    if ((Candles[1].EMA1 > Candles[1].EMA2) && (Candles[2].EMA1 <= Candles[2].EMA2) && (Candles[1].RSI < rsiDown)) // Most recently closed candle crossed over up
+                    if ((Candles[1].EMA1 > Candles[1].EMA2) && (Candles[2].EMA1 <= Candles[2].EMA2) && (Candles[1].RSI < rsiOversold)) // Most recently closed candle crossed over up
                     {
                         // Did the last full candle have MA1 cross above MA2?  Triggers a buy in switch setting.
                         Mode = "Buy";
                     }
-                    else if ((Candles[1].EMA1 < Candles[1].EMA2) && (Candles[2].EMA1 >= Candles[2].EMA2) && (Candles[1].RSI > rsiUp))
+                    else if ((Candles[1].EMA1 < Candles[1].EMA2) && (Candles[2].EMA1 >= Candles[2].EMA2) && (Candles[1].RSI > rsiOverbought))
                     {
                         // Did the last full candle have MA1 cross below MA2?  Triggers a sell in switch setting
                         Mode = "Sell";
@@ -729,13 +753,13 @@ namespace BitmexBot
                     //NEW
                     if ((Candles[1].EMA1 > Candles[1].EMA2) &&
                         (Candles[2].EMA1 <= Candles[2].EMA2) &&
-                        (Candles[1].RSI < rsiDown) &&
+                        (Candles[1].RSI < rsiOversold) &&
                         (Candles[1].STOCHD < stochDown)) // Most recently closed candle crossed over up
                     {
                         // Did the last full candle have MA1 cross above MA2?  Triggers a buy in switch setting.
                         Mode = "Buy";
                     }
-                    else if ((Candles[1].EMA1 < Candles[1].EMA2) && (Candles[2].EMA1 >= Candles[2].EMA2) && (Candles[1].RSI > rsiUp))
+                    else if ((Candles[1].EMA1 < Candles[1].EMA2) && (Candles[2].EMA1 >= Candles[2].EMA2) && (Candles[1].RSI > rsiOverbought))
                     {
                         // Did the last full candle have MA1 cross below MA2?  Triggers a sell in switch setting
                         Mode = "Sell";
@@ -782,10 +806,7 @@ namespace BitmexBot
         {
             if (chkUpdateCandles.Checked)
             {
-                Task.Run(() => 
-                {
-                    UpdateCandles();
-                });
+                UpdateCandles();
             }
         }
 
@@ -846,7 +867,7 @@ namespace BitmexBot
                     // Make a market order to close out the position, also cancel all orders so nothing else fills if we had unfilled limit orders still open.
                     string Side = "Sell";
                     int Quantity = 0;
-                    int percentage = Convert.ToInt32(nuDiversification);
+                    int percentage = Convert.ToInt32(nuDiversification.Value);
 
                     if (OpenPositions[0].CurrentQty > 0)
                     {
@@ -1061,7 +1082,7 @@ namespace BitmexBot
                     case "Buy":
                         if (OpenPositions.Any())
                         {
-                            int percentage = Convert.ToInt32(nuDiversification);
+                            int percentage = Convert.ToInt32(nuDiversification.Value);
                             int qtyByPercentage = Convert.ToInt32(WalletBalance / percentage);
                             int PositionDifference = Convert.ToInt32(nudAutoQuantity.Value - OpenPositions[0].CurrentQty);
 
@@ -1107,7 +1128,7 @@ namespace BitmexBot
                         }
                         else
                         {
-                            int percentage = Convert.ToInt32(nuDiversification);
+                            int percentage = Convert.ToInt32(nuDiversification.Value);
                             int qtyByPercentage = Convert.ToInt32(WalletBalance / percentage);
 
                             if (OpenOrders.Any())
@@ -1233,7 +1254,7 @@ namespace BitmexBot
                         // Close any open orders, close any open shorts, we've missed our chance to long.
                         if (OpenPositions.Any())
                         {
-                            int percentage = Convert.ToInt32(nuDiversification);
+                            int percentage = Convert.ToInt32(nuDiversification.Value);
                             int qtyByPercentage = Convert.ToInt32(WalletBalance / percentage);
 
                             // Now, do we have open orders?  If so, we want to make sure they are at the right price
@@ -1533,6 +1554,23 @@ namespace BitmexBot
                 string OrderJSON = BuildBulkOrder(OpenOrders, true);
                 bitmex.AmendBulkOrder(OrderJSON);
             }
+        }
+
+        private bool checkPumpAndDump(List<Candle> candlesHistory)
+        {
+            if (chkPumpdump.Checked)
+            {
+                double percentPump = Convert.ToDouble(nuPumpPercentage.Value);
+                double previousPrice = candlesHistory.FirstOrDefault().Close.Value;
+                
+            }
+
+            return false;
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            ddlPumpDumpTime.SelectedIndex = 0;
         }
     }
 }

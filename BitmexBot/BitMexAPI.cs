@@ -288,6 +288,20 @@ namespace BitmexBot
             return JsonConvert.DeserializeObject<List<Candle>>(res).OrderByDescending(a => a.TimeStamp).ToList();
         }
 
+        public List<Candle> GetCandleHistory(string symbol, int count, string size, DateTime startTime, DateTime endTime)
+        {
+            var param = new Dictionary<string, string>();
+            param["symbol"] = symbol;
+            param["count"] = count.ToString();
+            param["reverse"] = true.ToString();
+            param["partial"] = false.ToString();
+            param["binSize"] = size;
+            param["start_time"] = startTime.ToString();
+            param["end_time"] = endTime.ToString();
+            string res = Query("GET", "/trade/bucketed", param);
+            return JsonConvert.DeserializeObject<List<Candle>>(res).OrderByDescending(a => a.TimeStamp).ToList();
+        }
+
         public List<Position> GetOpenPositions(string symbol)
         {
             var param = new Dictionary<string, string>();

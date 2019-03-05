@@ -47,7 +47,6 @@ namespace BitmexBot
             this.rdoSell = new System.Windows.Forms.RadioButton();
             this.rdoSwitch = new System.Windows.Forms.RadioButton();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.chkPumpDumpProtection = new System.Windows.Forms.CheckBox();
             this.chkDiversification = new System.Windows.Forms.CheckBox();
             this.label13 = new System.Windows.Forms.Label();
             this.nuDiversification = new System.Windows.Forms.NumericUpDown();
@@ -97,15 +96,21 @@ namespace BitmexBot
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.cbRSI = new System.Windows.Forms.CheckBox();
             this.label10 = new System.Windows.Forms.Label();
-            this.nuRSIDown = new System.Windows.Forms.NumericUpDown();
+            this.nuRSIOversold = new System.Windows.Forms.NumericUpDown();
             this.label7 = new System.Windows.Forms.Label();
-            this.nuRSIUp = new System.Windows.Forms.NumericUpDown();
+            this.nuRSIOverbought = new System.Windows.Forms.NumericUpDown();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
             this.cbStochastic = new System.Windows.Forms.CheckBox();
             this.label9 = new System.Windows.Forms.Label();
             this.nuStochDown = new System.Windows.Forms.NumericUpDown();
             this.label12 = new System.Windows.Forms.Label();
             this.nuStochUp = new System.Windows.Forms.NumericUpDown();
+            this.groupBox6 = new System.Windows.Forms.GroupBox();
+            this.label15 = new System.Windows.Forms.Label();
+            this.nuPumpPercentage = new System.Windows.Forms.NumericUpDown();
+            this.label14 = new System.Windows.Forms.Label();
+            this.ddlPumpDumpTime = new System.Windows.Forms.ComboBox();
+            this.chkPumpdump = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.nudQty)).BeginInit();
             this.gbCandles.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -124,11 +129,13 @@ namespace BitmexBot
             ((System.ComponentModel.ISupportInitialize)(this.nuEMA2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nuEMA1)).BeginInit();
             this.groupBox4.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.nuRSIDown)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nuRSIUp)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nuRSIOversold)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nuRSIOverbought)).BeginInit();
             this.groupBox5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nuStochDown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nuStochUp)).BeginInit();
+            this.groupBox6.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nuPumpPercentage)).BeginInit();
             this.SuspendLayout();
             // 
             // btnBuy
@@ -278,11 +285,11 @@ namespace BitmexBot
             // 
             this.gbCandles.Controls.Add(this.chkUpdateCandles);
             this.gbCandles.Controls.Add(this.ddlCandleTimes);
-            this.gbCandles.Location = new System.Drawing.Point(20, 313);
+            this.gbCandles.Location = new System.Drawing.Point(20, 337);
             this.gbCandles.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.gbCandles.Name = "gbCandles";
             this.gbCandles.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.gbCandles.Size = new System.Drawing.Size(277, 95);
+            this.gbCandles.Size = new System.Drawing.Size(280, 95);
             this.gbCandles.TabIndex = 10;
             this.gbCandles.TabStop = false;
             this.gbCandles.Text = "Candles";
@@ -292,7 +299,7 @@ namespace BitmexBot
             this.chkUpdateCandles.AutoSize = true;
             this.chkUpdateCandles.Checked = true;
             this.chkUpdateCandles.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkUpdateCandles.Location = new System.Drawing.Point(115, 31);
+            this.chkUpdateCandles.Location = new System.Drawing.Point(111, 33);
             this.chkUpdateCandles.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.chkUpdateCandles.Name = "chkUpdateCandles";
             this.chkUpdateCandles.Size = new System.Drawing.Size(161, 24);
@@ -310,16 +317,15 @@ namespace BitmexBot
             // rdoBuy
             // 
             this.rdoBuy.AutoSize = true;
-            this.rdoBuy.Checked = true;
             this.rdoBuy.Location = new System.Drawing.Point(237, 20);
             this.rdoBuy.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.rdoBuy.Name = "rdoBuy";
             this.rdoBuy.Size = new System.Drawing.Size(61, 24);
             this.rdoBuy.TabIndex = 11;
-            this.rdoBuy.TabStop = true;
             this.rdoBuy.Text = "Buy";
             this.rdoBuy.UseVisualStyleBackColor = true;
             this.rdoBuy.UseWaitCursor = true;
+            this.rdoBuy.Visible = false;
             // 
             // rdoSell
             // 
@@ -332,22 +338,25 @@ namespace BitmexBot
             this.rdoSell.Text = "Sell";
             this.rdoSell.UseVisualStyleBackColor = true;
             this.rdoSell.UseWaitCursor = true;
+            this.rdoSell.Visible = false;
             // 
             // rdoSwitch
             // 
             this.rdoSwitch.AutoSize = true;
+            this.rdoSwitch.Checked = true;
             this.rdoSwitch.Location = new System.Drawing.Point(237, 72);
             this.rdoSwitch.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.rdoSwitch.Name = "rdoSwitch";
             this.rdoSwitch.Size = new System.Drawing.Size(81, 24);
             this.rdoSwitch.TabIndex = 13;
+            this.rdoSwitch.TabStop = true;
             this.rdoSwitch.Text = "Switch";
             this.rdoSwitch.UseVisualStyleBackColor = true;
             this.rdoSwitch.UseWaitCursor = true;
+            this.rdoSwitch.Visible = false;
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.chkPumpDumpProtection);
             this.groupBox1.Controls.Add(this.chkDiversification);
             this.groupBox1.Controls.Add(this.label13);
             this.groupBox1.Controls.Add(this.nuDiversification);
@@ -361,24 +370,14 @@ namespace BitmexBot
             this.groupBox1.Controls.Add(this.rdoSell);
             this.groupBox1.Controls.Add(this.rdoSwitch);
             this.groupBox1.Controls.Add(this.rdoBuy);
-            this.groupBox1.Location = new System.Drawing.Point(1166, 80);
+            this.groupBox1.Location = new System.Drawing.Point(1162, 105);
             this.groupBox1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.groupBox1.Size = new System.Drawing.Size(521, 223);
+            this.groupBox1.Size = new System.Drawing.Size(521, 186);
             this.groupBox1.TabIndex = 14;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Automated Trading";
-            // 
-            // chkPumpDumpProtection
-            // 
-            this.chkPumpDumpProtection.AutoSize = true;
-            this.chkPumpDumpProtection.Location = new System.Drawing.Point(10, 181);
-            this.chkPumpDumpProtection.Name = "chkPumpDumpProtection";
-            this.chkPumpDumpProtection.Size = new System.Drawing.Size(226, 24);
-            this.chkPumpDumpProtection.TabIndex = 27;
-            this.chkPumpDumpProtection.Text = "Pump and dump protection";
-            this.chkPumpDumpProtection.UseVisualStyleBackColor = true;
             // 
             // chkDiversification
             // 
@@ -395,7 +394,7 @@ namespace BitmexBot
             // label13
             // 
             this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(293, 158);
+            this.label13.Location = new System.Drawing.Point(319, 156);
             this.label13.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(91, 20);
@@ -411,7 +410,7 @@ namespace BitmexBot
             0,
             0,
             131072});
-            this.nuDiversification.Location = new System.Drawing.Point(195, 152);
+            this.nuDiversification.Location = new System.Drawing.Point(204, 152);
             this.nuDiversification.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.nuDiversification.Maximum = new decimal(new int[] {
             1000000,
@@ -423,7 +422,7 @@ namespace BitmexBot
             this.nuDiversification.TabIndex = 22;
             this.nuDiversification.UseWaitCursor = true;
             this.nuDiversification.Value = new decimal(new int[] {
-            25,
+            10,
             0,
             0,
             0});
@@ -441,7 +440,7 @@ namespace BitmexBot
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(289, 122);
+            this.label1.Location = new System.Drawing.Point(319, 122);
             this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(181, 20);
@@ -457,7 +456,7 @@ namespace BitmexBot
             0,
             0,
             131072});
-            this.nudAutoMarketTakeProfitPercent.Location = new System.Drawing.Point(195, 118);
+            this.nudAutoMarketTakeProfitPercent.Location = new System.Drawing.Point(205, 118);
             this.nudAutoMarketTakeProfitPercent.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.nudAutoMarketTakeProfitPercent.Maximum = new decimal(new int[] {
             1000000,
@@ -560,10 +559,10 @@ namespace BitmexBot
             this.stsAPIValid,
             this.stsAccountBalance,
             this.stsOTProgress});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 419);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 478);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Padding = new System.Windows.Forms.Padding(2, 0, 21, 0);
-            this.statusStrip1.Size = new System.Drawing.Size(1700, 30);
+            this.statusStrip1.Size = new System.Drawing.Size(1704, 30);
             this.statusStrip1.TabIndex = 15;
             this.statusStrip1.Text = "statusStrip1";
             this.statusStrip1.UseWaitCursor = true;
@@ -863,7 +862,7 @@ namespace BitmexBot
             this.groupBox2.Controls.Add(this.nudMA2);
             this.groupBox2.Controls.Add(this.lblMA1);
             this.groupBox2.Controls.Add(this.nudMA1);
-            this.groupBox2.Location = new System.Drawing.Point(308, 313);
+            this.groupBox2.Location = new System.Drawing.Point(308, 337);
             this.groupBox2.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
@@ -895,7 +894,7 @@ namespace BitmexBot
             this.nudMA2.Size = new System.Drawing.Size(63, 26);
             this.nudMA2.TabIndex = 19;
             this.nudMA2.Value = new decimal(new int[] {
-            100,
+            5,
             0,
             0,
             0});
@@ -923,7 +922,7 @@ namespace BitmexBot
             this.nudMA1.Size = new System.Drawing.Size(63, 26);
             this.nudMA1.TabIndex = 17;
             this.nudMA1.Value = new decimal(new int[] {
-            55,
+            3,
             0,
             0,
             0});
@@ -935,11 +934,11 @@ namespace BitmexBot
             this.groupBox3.Controls.Add(this.nuEMA2);
             this.groupBox3.Controls.Add(this.label11);
             this.groupBox3.Controls.Add(this.nuEMA1);
-            this.groupBox3.Location = new System.Drawing.Point(572, 313);
+            this.groupBox3.Location = new System.Drawing.Point(570, 337);
             this.groupBox3.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.groupBox3.Size = new System.Drawing.Size(254, 95);
+            this.groupBox3.Size = new System.Drawing.Size(257, 95);
             this.groupBox3.TabIndex = 35;
             this.groupBox3.TabStop = false;
             // 
@@ -956,7 +955,7 @@ namespace BitmexBot
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(199, 39);
+            this.label8.Location = new System.Drawing.Point(204, 38);
             this.label8.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(53, 20);
@@ -965,7 +964,7 @@ namespace BitmexBot
             // 
             // nuEMA2
             // 
-            this.nuEMA2.Location = new System.Drawing.Point(131, 35);
+            this.nuEMA2.Location = new System.Drawing.Point(145, 32);
             this.nuEMA2.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.nuEMA2.Minimum = new decimal(new int[] {
             1,
@@ -984,7 +983,7 @@ namespace BitmexBot
             // label11
             // 
             this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(85, 39);
+            this.label11.Location = new System.Drawing.Point(84, 37);
             this.label11.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(53, 20);
@@ -1013,10 +1012,10 @@ namespace BitmexBot
             // 
             this.groupBox4.Controls.Add(this.cbRSI);
             this.groupBox4.Controls.Add(this.label10);
-            this.groupBox4.Controls.Add(this.nuRSIDown);
+            this.groupBox4.Controls.Add(this.nuRSIOversold);
             this.groupBox4.Controls.Add(this.label7);
-            this.groupBox4.Controls.Add(this.nuRSIUp);
-            this.groupBox4.Location = new System.Drawing.Point(835, 313);
+            this.groupBox4.Controls.Add(this.nuRSIOverbought);
+            this.groupBox4.Location = new System.Drawing.Point(835, 337);
             this.groupBox4.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.groupBox4.Name = "groupBox4";
             this.groupBox4.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
@@ -1037,27 +1036,27 @@ namespace BitmexBot
             // label10
             // 
             this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(194, 38);
+            this.label10.Location = new System.Drawing.Point(124, 65);
             this.label10.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(50, 20);
+            this.label10.Size = new System.Drawing.Size(71, 20);
             this.label10.TabIndex = 22;
-            this.label10.Text = "Down";
+            this.label10.Text = "Oversold";
             // 
-            // nuRSIDown
+            // nuRSIOversold
             // 
-            this.nuRSIDown.Location = new System.Drawing.Point(128, 34);
-            this.nuRSIDown.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.nuRSIDown.Minimum = new decimal(new int[] {
+            this.nuRSIOversold.Location = new System.Drawing.Point(128, 34);
+            this.nuRSIOversold.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.nuRSIOversold.Minimum = new decimal(new int[] {
             1,
             0,
             0,
             0});
-            this.nuRSIDown.Name = "nuRSIDown";
-            this.nuRSIDown.Size = new System.Drawing.Size(63, 26);
-            this.nuRSIDown.TabIndex = 21;
-            this.nuRSIDown.Value = new decimal(new int[] {
-            14,
+            this.nuRSIOversold.Name = "nuRSIOversold";
+            this.nuRSIOversold.Size = new System.Drawing.Size(63, 26);
+            this.nuRSIOversold.TabIndex = 21;
+            this.nuRSIOversold.Value = new decimal(new int[] {
+            30,
             0,
             0,
             0});
@@ -1065,27 +1064,27 @@ namespace BitmexBot
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(92, 38);
+            this.label7.Location = new System.Drawing.Point(24, 65);
             this.label7.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(30, 20);
+            this.label7.Size = new System.Drawing.Size(92, 20);
             this.label7.TabIndex = 20;
-            this.label7.Text = "Up";
+            this.label7.Text = "Overbought";
             // 
-            // nuRSIUp
+            // nuRSIOverbought
             // 
-            this.nuRSIUp.Location = new System.Drawing.Point(21, 34);
-            this.nuRSIUp.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.nuRSIUp.Minimum = new decimal(new int[] {
+            this.nuRSIOverbought.Location = new System.Drawing.Point(21, 34);
+            this.nuRSIOverbought.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.nuRSIOverbought.Minimum = new decimal(new int[] {
             1,
             0,
             0,
             0});
-            this.nuRSIUp.Name = "nuRSIUp";
-            this.nuRSIUp.Size = new System.Drawing.Size(63, 26);
-            this.nuRSIUp.TabIndex = 19;
-            this.nuRSIUp.Value = new decimal(new int[] {
-            14,
+            this.nuRSIOverbought.Name = "nuRSIOverbought";
+            this.nuRSIOverbought.Size = new System.Drawing.Size(63, 26);
+            this.nuRSIOverbought.TabIndex = 19;
+            this.nuRSIOverbought.Value = new decimal(new int[] {
+            70,
             0,
             0,
             0});
@@ -1097,7 +1096,7 @@ namespace BitmexBot
             this.groupBox5.Controls.Add(this.nuStochDown);
             this.groupBox5.Controls.Add(this.label12);
             this.groupBox5.Controls.Add(this.nuStochUp);
-            this.groupBox5.Location = new System.Drawing.Point(1100, 313);
+            this.groupBox5.Location = new System.Drawing.Point(1100, 337);
             this.groupBox5.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.groupBox5.Name = "groupBox5";
             this.groupBox5.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
@@ -1171,11 +1170,96 @@ namespace BitmexBot
             0,
             0});
             // 
+            // groupBox6
+            // 
+            this.groupBox6.Controls.Add(this.label15);
+            this.groupBox6.Controls.Add(this.nuPumpPercentage);
+            this.groupBox6.Controls.Add(this.label14);
+            this.groupBox6.Controls.Add(this.ddlPumpDumpTime);
+            this.groupBox6.Controls.Add(this.chkPumpdump);
+            this.groupBox6.Location = new System.Drawing.Point(1366, 338);
+            this.groupBox6.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.groupBox6.Name = "groupBox6";
+            this.groupBox6.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.groupBox6.Size = new System.Drawing.Size(317, 95);
+            this.groupBox6.TabIndex = 38;
+            this.groupBox6.TabStop = false;
+            // 
+            // label15
+            // 
+            this.label15.AutoSize = true;
+            this.label15.Location = new System.Drawing.Point(273, 43);
+            this.label15.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(23, 20);
+            this.label15.TabIndex = 31;
+            this.label15.Text = "%";
+            // 
+            // nuPumpPercentage
+            // 
+            this.nuPumpPercentage.DecimalPlaces = 2;
+            this.nuPumpPercentage.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            131072});
+            this.nuPumpPercentage.Location = new System.Drawing.Point(176, 41);
+            this.nuPumpPercentage.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.nuPumpPercentage.Maximum = new decimal(new int[] {
+            1000000,
+            0,
+            0,
+            0});
+            this.nuPumpPercentage.Name = "nuPumpPercentage";
+            this.nuPumpPercentage.Size = new System.Drawing.Size(90, 26);
+            this.nuPumpPercentage.TabIndex = 30;
+            this.nuPumpPercentage.UseWaitCursor = true;
+            this.nuPumpPercentage.Value = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Location = new System.Drawing.Point(124, 44);
+            this.label14.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(44, 20);
+            this.label14.TabIndex = 29;
+            this.label14.Text = "Hour";
+            // 
+            // ddlPumpDumpTime
+            // 
+            this.ddlPumpDumpTime.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.ddlPumpDumpTime.FormattingEnabled = true;
+            this.ddlPumpDumpTime.Items.AddRange(new object[] {
+            "1",
+            "4"});
+            this.ddlPumpDumpTime.Location = new System.Drawing.Point(18, 40);
+            this.ddlPumpDumpTime.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.ddlPumpDumpTime.Name = "ddlPumpDumpTime";
+            this.ddlPumpDumpTime.Size = new System.Drawing.Size(98, 28);
+            this.ddlPumpDumpTime.TabIndex = 28;
+            this.ddlPumpDumpTime.UseWaitCursor = true;
+            // 
+            // chkPumpdump
+            // 
+            this.chkPumpdump.AutoSize = true;
+            this.chkPumpdump.Location = new System.Drawing.Point(18, 4);
+            this.chkPumpdump.Name = "chkPumpdump";
+            this.chkPumpdump.Size = new System.Drawing.Size(226, 24);
+            this.chkPumpdump.TabIndex = 27;
+            this.chkPumpdump.Text = "Pump and dump protection";
+            this.chkPumpdump.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1700, 449);
+            this.ClientSize = new System.Drawing.Size(1704, 508);
+            this.Controls.Add(this.groupBox6);
             this.Controls.Add(this.groupBox5);
             this.Controls.Add(this.groupBox4);
             this.Controls.Add(this.groupBox3);
@@ -1214,6 +1298,7 @@ namespace BitmexBot
             this.MaximizeBox = false;
             this.Name = "Form1";
             this.Sizable = false;
+            this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.nudQty)).EndInit();
             this.gbCandles.ResumeLayout(false);
             this.gbCandles.PerformLayout();
@@ -1238,12 +1323,15 @@ namespace BitmexBot
             ((System.ComponentModel.ISupportInitialize)(this.nuEMA1)).EndInit();
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.nuRSIDown)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nuRSIUp)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nuRSIOversold)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nuRSIOverbought)).EndInit();
             this.groupBox5.ResumeLayout(false);
             this.groupBox5.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nuStochDown)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nuStochUp)).EndInit();
+            this.groupBox6.ResumeLayout(false);
+            this.groupBox6.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nuPumpPercentage)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1312,9 +1400,9 @@ namespace BitmexBot
         private System.Windows.Forms.GroupBox groupBox4;
         private System.Windows.Forms.CheckBox cbRSI;
         private System.Windows.Forms.Label label10;
-        private System.Windows.Forms.NumericUpDown nuRSIDown;
+        private System.Windows.Forms.NumericUpDown nuRSIOversold;
         private System.Windows.Forms.Label label7;
-        private System.Windows.Forms.NumericUpDown nuRSIUp;
+        private System.Windows.Forms.NumericUpDown nuRSIOverbought;
         private System.Windows.Forms.GroupBox groupBox5;
         private System.Windows.Forms.CheckBox cbStochastic;
         private System.Windows.Forms.Label label9;
@@ -1324,7 +1412,12 @@ namespace BitmexBot
         private System.Windows.Forms.Label label13;
         private System.Windows.Forms.NumericUpDown nuDiversification;
         private System.Windows.Forms.CheckBox chkDiversification;
-        private System.Windows.Forms.CheckBox chkPumpDumpProtection;
+        private System.Windows.Forms.GroupBox groupBox6;
+        private System.Windows.Forms.Label label15;
+        private System.Windows.Forms.NumericUpDown nuPumpPercentage;
+        private System.Windows.Forms.Label label14;
+        private System.Windows.Forms.ComboBox ddlPumpDumpTime;
+        private System.Windows.Forms.CheckBox chkPumpdump;
     }
 }
 
