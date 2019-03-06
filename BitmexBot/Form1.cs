@@ -116,9 +116,8 @@ namespace BitmexBot
             ddlNetwork.SelectedIndex = 0;
             ddlOrderType.SelectedIndex = 0;
             ddlCandleTimes.SelectedIndex = 0;
-            ddlAutoOrderType.SelectedIndex = 0;
             ddlPumpDumpTime.SelectedIndex = 0;
-
+            ddlAutoOrderType.SelectedIndex = 0;
             LoadAPISettings();
         }
 
@@ -296,7 +295,7 @@ namespace BitmexBot
 
         private void UpdateCandles()
         {
-            int hour = 1;
+            int hour = Convert.ToInt32(ddlPumpDumpTime.SelectedItem.ToString());
 
             // Get candles
             Candles = bitmex.GetCandleHistory(ActiveInstrument.Symbol, 500, ddlCandleTimes.SelectedItem.ToString());
@@ -636,7 +635,6 @@ namespace BitmexBot
             if (Running)//We could set this up to also ignore setting bot mode if we've already reviewed current candles
                       //  However, if you wanted to use info from the most current candle, that wouldn't work well
             {
-                checkPumpAndDump(CandlesHistory);
                 SetBotMode();  // We really only need to set bot mode if the bot is running
                 btnAutomatedTrading.Text = "Stop - " + Mode;// so we can see what the mode of the bot is while running
             }
@@ -707,11 +705,21 @@ namespace BitmexBot
                     {
                         // Did the last full candle have MA1 cross above MA2?  Triggers a buy in switch setting.
                         Mode = "Buy";
+
+                        if (checkPumpAndDump(CandlesHistory, Candles))
+                        {
+                            Mode = "Wait";
+                        }
                     }
                     else if ((Candles[1].EMA1 < Candles[1].EMA2) && (Candles[2].EMA1 >= Candles[2].EMA2))
                     {
                         // Did the last full candle have MA1 cross below MA2?  Triggers a sell in switch setting
                         Mode = "Sell";
+
+                        if (checkPumpAndDump(CandlesHistory, Candles))
+                        {
+                            Mode = "Wait";
+                        }
                     }
                     else if ((Candles[1].EMA1 > Candles[1].EMA2) && (Candles[2].EMA1 > Candles[2].EMA2))
                     {
@@ -731,11 +739,21 @@ namespace BitmexBot
                     {
                         // Did the last full candle have MA1 cross above MA2?  Triggers a buy in switch setting.
                         Mode = "Buy";
+
+                        if (checkPumpAndDump(CandlesHistory, Candles))
+                        {
+                            Mode = "Wait";
+                        }
                     }
                     else if ((Candles[1].EMA1 < Candles[1].EMA2) && (Candles[2].EMA1 >= Candles[2].EMA2) && (Candles[1].RSI > rsiOverbought))
                     {
                         // Did the last full candle have MA1 cross below MA2?  Triggers a sell in switch setting
                         Mode = "Sell";
+
+                        if (checkPumpAndDump(CandlesHistory, Candles))
+                        {
+                            Mode = "Wait";
+                        }
                     }
                     else if ((Candles[1].EMA1 > Candles[1].EMA2) && (Candles[2].EMA1 > Candles[2].EMA2))
                     {
@@ -758,11 +776,21 @@ namespace BitmexBot
                     {
                         // Did the last full candle have MA1 cross above MA2?  Triggers a buy in switch setting.
                         Mode = "Buy";
+
+                        if (checkPumpAndDump(CandlesHistory, Candles))
+                        {
+                            Mode = "Wait";
+                        }
                     }
                     else if ((Candles[1].EMA1 < Candles[1].EMA2) && (Candles[2].EMA1 >= Candles[2].EMA2) && (Candles[1].RSI > rsiOverbought))
                     {
                         // Did the last full candle have MA1 cross below MA2?  Triggers a sell in switch setting
                         Mode = "Sell";
+
+                        if (checkPumpAndDump(CandlesHistory, Candles))
+                        {
+                            Mode = "Wait";
+                        }
                     }
                     else if ((Candles[1].EMA1 > Candles[1].EMA2) && (Candles[2].EMA1 > Candles[2].EMA2))
                     {
@@ -782,11 +810,21 @@ namespace BitmexBot
                     {
                         // Did the last full candle have MA1 cross above MA2?  Triggers a buy in switch setting.
                         Mode = "Buy";
+
+                        if (checkPumpAndDump(CandlesHistory, Candles))
+                        {
+                            Mode = "Wait";
+                        }
                     }
                     else if ((Candles[1].MA1 < Candles[1].MA2) && (Candles[2].MA1 >= Candles[2].MA2))
                     {
                         // Did the last full candle have MA1 cross below MA2?  Triggers a sell in switch setting
                         Mode = "Sell";
+
+                        if (checkPumpAndDump(CandlesHistory, Candles))
+                        {
+                            Mode = "Wait";
+                        }
                     }
                     else if ((Candles[1].MA1 > Candles[1].MA2) && (Candles[2].MA1 > Candles[2].MA2))
                     {
@@ -1556,21 +1594,22 @@ namespace BitmexBot
             }
         }
 
-        private bool checkPumpAndDump(List<Candle> candlesHistory)
+        private bool checkPumpAndDump(List<Candle> candlesHistory, List<Candle> currentCandles)
         {
             if (chkPumpdump.Checked)
             {
                 double percentPump = Convert.ToDouble(nuPumpPercentage.Value);
                 double previousPrice = candlesHistory.FirstOrDefault().Close.Value;
-                
+                double percentage = ((double)previousPrice / 100) * percentPump;
+                double prevPricePump = previousPrice + percentage;
+                double currentPrice = currentCandles[0].Close.Value;
+
+                if (currentPrice >= prevPricePump)
+                    return false;
             }
 
-            return false;
+            return true;
         }
 
-        private void Form1_Load(object sender, EventArgs e)
-        {
-            ddlPumpDumpTime.SelectedIndex = 0;
-        }
     }
 }

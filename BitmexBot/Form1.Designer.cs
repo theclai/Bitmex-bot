@@ -109,8 +109,8 @@ namespace BitmexBot
             this.label15 = new System.Windows.Forms.Label();
             this.nuPumpPercentage = new System.Windows.Forms.NumericUpDown();
             this.label14 = new System.Windows.Forms.Label();
-            this.ddlPumpDumpTime = new System.Windows.Forms.ComboBox();
             this.chkPumpdump = new System.Windows.Forms.CheckBox();
+            this.ddlPumpDumpTime = new System.Windows.Forms.ComboBox();
             ((System.ComponentModel.ISupportInitialize)(this.nudQty)).BeginInit();
             this.gbCandles.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -1172,10 +1172,10 @@ namespace BitmexBot
             // 
             // groupBox6
             // 
+            this.groupBox6.Controls.Add(this.ddlPumpDumpTime);
             this.groupBox6.Controls.Add(this.label15);
             this.groupBox6.Controls.Add(this.nuPumpPercentage);
             this.groupBox6.Controls.Add(this.label14);
-            this.groupBox6.Controls.Add(this.ddlPumpDumpTime);
             this.groupBox6.Controls.Add(this.chkPumpdump);
             this.groupBox6.Location = new System.Drawing.Point(1366, 338);
             this.groupBox6.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
@@ -1230,20 +1230,6 @@ namespace BitmexBot
             this.label14.TabIndex = 29;
             this.label14.Text = "Hour";
             // 
-            // ddlPumpDumpTime
-            // 
-            this.ddlPumpDumpTime.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.ddlPumpDumpTime.FormattingEnabled = true;
-            this.ddlPumpDumpTime.Items.AddRange(new object[] {
-            "1",
-            "4"});
-            this.ddlPumpDumpTime.Location = new System.Drawing.Point(18, 40);
-            this.ddlPumpDumpTime.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.ddlPumpDumpTime.Name = "ddlPumpDumpTime";
-            this.ddlPumpDumpTime.Size = new System.Drawing.Size(98, 28);
-            this.ddlPumpDumpTime.TabIndex = 28;
-            this.ddlPumpDumpTime.UseWaitCursor = true;
-            // 
             // chkPumpdump
             // 
             this.chkPumpdump.AutoSize = true;
@@ -1253,6 +1239,21 @@ namespace BitmexBot
             this.chkPumpdump.TabIndex = 27;
             this.chkPumpdump.Text = "Pump and dump protection";
             this.chkPumpdump.UseVisualStyleBackColor = true;
+            // 
+            // ddlPumpDumpTime
+            // 
+            this.ddlPumpDumpTime.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.ddlPumpDumpTime.FormattingEnabled = true;
+            this.ddlPumpDumpTime.Items.AddRange(new object[] {
+            "1",
+            "4"});
+            this.ddlPumpDumpTime.Location = new System.Drawing.Point(18, 44);
+            this.ddlPumpDumpTime.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.ddlPumpDumpTime.Name = "ddlPumpDumpTime";
+            this.ddlPumpDumpTime.Size = new System.Drawing.Size(98, 28);
+            this.ddlPumpDumpTime.TabIndex = 32;
+            this.ddlPumpDumpTime.UseWaitCursor = true;
+            this.ddlPumpDumpTime.SelectedIndex = 0;
             // 
             // Form1
             // 
@@ -1298,7 +1299,6 @@ namespace BitmexBot
             this.MaximizeBox = false;
             this.Name = "Form1";
             this.Sizable = false;
-            this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.nudQty)).EndInit();
             this.gbCandles.ResumeLayout(false);
             this.gbCandles.PerformLayout();
@@ -1416,8 +1416,8 @@ namespace BitmexBot
         private System.Windows.Forms.Label label15;
         private System.Windows.Forms.NumericUpDown nuPumpPercentage;
         private System.Windows.Forms.Label label14;
-        private System.Windows.Forms.ComboBox ddlPumpDumpTime;
         private System.Windows.Forms.CheckBox chkPumpdump;
+        private System.Windows.Forms.ComboBox ddlPumpDumpTime;
     }
 }
 
