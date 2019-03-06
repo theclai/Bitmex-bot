@@ -31,6 +31,7 @@ namespace BitmexBot
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             this.btnBuy = new MaterialSkin.Controls.MaterialRaisedButton();
             this.btnSell = new System.Windows.Forms.Button();
             this.nudQty = new System.Windows.Forms.NumericUpDown();
@@ -106,11 +107,12 @@ namespace BitmexBot
             this.label12 = new System.Windows.Forms.Label();
             this.nuStochUp = new System.Windows.Forms.NumericUpDown();
             this.groupBox6 = new System.Windows.Forms.GroupBox();
+            this.ddlPumpDumpTime = new System.Windows.Forms.ComboBox();
             this.label15 = new System.Windows.Forms.Label();
             this.nuPumpPercentage = new System.Windows.Forms.NumericUpDown();
             this.label14 = new System.Windows.Forms.Label();
             this.chkPumpdump = new System.Windows.Forms.CheckBox();
-            this.ddlPumpDumpTime = new System.Windows.Forms.ComboBox();
+            this.dgvCandles = new System.Windows.Forms.DataGridView();
             ((System.ComponentModel.ISupportInitialize)(this.nudQty)).BeginInit();
             this.gbCandles.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -136,6 +138,7 @@ namespace BitmexBot
             ((System.ComponentModel.ISupportInitialize)(this.nuStochUp)).BeginInit();
             this.groupBox6.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nuPumpPercentage)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvCandles)).BeginInit();
             this.SuspendLayout();
             // 
             // btnBuy
@@ -370,7 +373,7 @@ namespace BitmexBot
             this.groupBox1.Controls.Add(this.rdoSell);
             this.groupBox1.Controls.Add(this.rdoSwitch);
             this.groupBox1.Controls.Add(this.rdoBuy);
-            this.groupBox1.Location = new System.Drawing.Point(1162, 105);
+            this.groupBox1.Location = new System.Drawing.Point(1328, 105);
             this.groupBox1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
@@ -559,10 +562,10 @@ namespace BitmexBot
             this.stsAPIValid,
             this.stsAccountBalance,
             this.stsOTProgress});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 478);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 852);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Padding = new System.Windows.Forms.Padding(2, 0, 21, 0);
-            this.statusStrip1.Size = new System.Drawing.Size(1704, 30);
+            this.statusStrip1.Size = new System.Drawing.Size(1879, 30);
             this.statusStrip1.TabIndex = 15;
             this.statusStrip1.Text = "statusStrip1";
             this.statusStrip1.UseWaitCursor = true;
@@ -587,7 +590,7 @@ namespace BitmexBot
             // 
             // btnAccountBalance
             // 
-            this.btnAccountBalance.Location = new System.Drawing.Point(1044, 203);
+            this.btnAccountBalance.Location = new System.Drawing.Point(1210, 203);
             this.btnAccountBalance.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.btnAccountBalance.Name = "btnAccountBalance";
             this.btnAccountBalance.Size = new System.Drawing.Size(112, 35);
@@ -631,7 +634,7 @@ namespace BitmexBot
             // 
             // txtAPIKey
             // 
-            this.txtAPIKey.Location = new System.Drawing.Point(1044, 111);
+            this.txtAPIKey.Location = new System.Drawing.Point(1210, 111);
             this.txtAPIKey.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.txtAPIKey.Name = "txtAPIKey";
             this.txtAPIKey.Size = new System.Drawing.Size(110, 26);
@@ -642,7 +645,7 @@ namespace BitmexBot
             // 
             // txtAPISecret
             // 
-            this.txtAPISecret.Location = new System.Drawing.Point(1044, 158);
+            this.txtAPISecret.Location = new System.Drawing.Point(1210, 158);
             this.txtAPISecret.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.txtAPISecret.Name = "txtAPISecret";
             this.txtAPISecret.Size = new System.Drawing.Size(110, 26);
@@ -654,7 +657,7 @@ namespace BitmexBot
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(998, 122);
+            this.label2.Location = new System.Drawing.Point(1164, 122);
             this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(35, 20);
@@ -665,7 +668,7 @@ namespace BitmexBot
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(978, 165);
+            this.label3.Location = new System.Drawing.Point(1144, 165);
             this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(56, 20);
@@ -1185,6 +1188,21 @@ namespace BitmexBot
             this.groupBox6.TabIndex = 38;
             this.groupBox6.TabStop = false;
             // 
+            // ddlPumpDumpTime
+            // 
+            this.ddlPumpDumpTime.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.ddlPumpDumpTime.FormattingEnabled = true;
+            this.ddlPumpDumpTime.Items.AddRange(new object[] {
+            "1",
+            "4"});
+            this.ddlPumpDumpTime.Location = new System.Drawing.Point(18, 44);
+            this.ddlPumpDumpTime.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.ddlPumpDumpTime.Name = "ddlPumpDumpTime";
+            this.ddlPumpDumpTime.Size = new System.Drawing.Size(98, 28);
+            this.ddlPumpDumpTime.TabIndex = 32;
+            this.ddlPumpDumpTime.UseWaitCursor = true;
+            this.ddlPumpDumpTime.SelectedIndex = 0;
+            // 
             // label15
             // 
             this.label15.AutoSize = true;
@@ -1240,26 +1258,36 @@ namespace BitmexBot
             this.chkPumpdump.Text = "Pump and dump protection";
             this.chkPumpdump.UseVisualStyleBackColor = true;
             // 
-            // ddlPumpDumpTime
+            // dgvCandles
             // 
-            this.ddlPumpDumpTime.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.ddlPumpDumpTime.FormattingEnabled = true;
-            this.ddlPumpDumpTime.Items.AddRange(new object[] {
-            "1",
-            "4"});
-            this.ddlPumpDumpTime.Location = new System.Drawing.Point(18, 44);
-            this.ddlPumpDumpTime.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.ddlPumpDumpTime.Name = "ddlPumpDumpTime";
-            this.ddlPumpDumpTime.Size = new System.Drawing.Size(98, 28);
-            this.ddlPumpDumpTime.TabIndex = 32;
-            this.ddlPumpDumpTime.UseWaitCursor = true;
-            this.ddlPumpDumpTime.SelectedIndex = 0;
+            this.dgvCandles.AllowUserToAddRows = false;
+            this.dgvCandles.AllowUserToDeleteRows = false;
+            this.dgvCandles.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.dgvCandles.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.dgvCandles.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dgvCandles.DefaultCellStyle = dataGridViewCellStyle1;
+            this.dgvCandles.Location = new System.Drawing.Point(15, 443);
+            this.dgvCandles.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.dgvCandles.Name = "dgvCandles";
+            this.dgvCandles.ReadOnly = true;
+            this.dgvCandles.RowHeadersVisible = false;
+            this.dgvCandles.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
+            this.dgvCandles.Size = new System.Drawing.Size(1840, 314);
+            this.dgvCandles.TabIndex = 39;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1704, 508);
+            this.ClientSize = new System.Drawing.Size(1879, 882);
+            this.Controls.Add(this.dgvCandles);
             this.Controls.Add(this.groupBox6);
             this.Controls.Add(this.groupBox5);
             this.Controls.Add(this.groupBox4);
@@ -1332,6 +1360,7 @@ namespace BitmexBot
             this.groupBox6.ResumeLayout(false);
             this.groupBox6.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nuPumpPercentage)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvCandles)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1418,6 +1447,7 @@ namespace BitmexBot
         private System.Windows.Forms.Label label14;
         private System.Windows.Forms.CheckBox chkPumpdump;
         private System.Windows.Forms.ComboBox ddlPumpDumpTime;
+        private System.Windows.Forms.DataGridView dgvCandles;
     }
 }
 

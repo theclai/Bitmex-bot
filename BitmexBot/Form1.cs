@@ -629,7 +629,7 @@ namespace BitmexBot
             Candles = Candles.OrderByDescending(a => a.TimeStamp).ToList();
 
             //// Show Candles
-            //dgvCandles.DataSource = Candles;
+            dgvCandles.DataSource = Candles;
 
             // This is where we are going to determine the "mode" of the bot based on MAs, trades happen on another timer
             if (Running)//We could set this up to also ignore setting bot mode if we've already reviewed current candles
