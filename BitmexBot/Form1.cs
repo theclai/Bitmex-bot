@@ -641,8 +641,8 @@ namespace BitmexBot
         {
             int rsiBuy = Convert.ToInt32(nuRsiBuy.Value);
             int rsiSell = Convert.ToInt32(nuRsiSell.Value);
-            int stochBuy = Convert.ToInt32(nuStochBuy);
-            int stochSell = Convert.ToInt32(nuStochSell);
+            int stochBuy = Convert.ToInt32(nuStochBuy.Value);
+            int stochSell = Convert.ToInt32(nuStochSell.Value);
 
             // This is where we are going to determine what mode the bot is in
             if (rdoBuy.Checked)
