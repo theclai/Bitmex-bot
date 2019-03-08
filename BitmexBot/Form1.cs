@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using MaterialSkin;
 using MaterialSkin.Controls;
-
+using System.Reflection;
 
 namespace BitmexBot
 {
@@ -1719,5 +1719,17 @@ namespace BitmexBot
             return true;
         }
 
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            //Version version = Assembly.GetExecutingAssembly().GetName().Version;
+            //Text = Text + " " + version.Major + "." + version.Minor + " (build " + version.Build + ")"; //change form title
+            var version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+            this.Text = String.Format("Bitmex bot {0}", version);
+
+            //string productVersion = System.Windows.Forms.Application.ProductVersion;
+            //this.Text = String.Format("Bitmex bot {0}", productVersion);
+
+            //lblBuildVersion.Text = productVersion.ToString();
+        }
     }
 }
