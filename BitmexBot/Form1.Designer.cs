@@ -31,7 +31,7 @@ namespace BitmexBot
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             this.btnBuy = new MaterialSkin.Controls.MaterialRaisedButton();
             this.btnSell = new System.Windows.Forms.Button();
             this.nudQty = new System.Windows.Forms.NumericUpDown();
@@ -60,6 +60,7 @@ namespace BitmexBot
             this.btnAutomatedTrading = new MaterialSkin.Controls.MaterialRaisedButton();
             this.tmrAutoTradeExecution = new System.Windows.Forms.Timer(this.components);
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.stsAPIValid = new System.Windows.Forms.ToolStripStatusLabel();
             this.stsAccountBalance = new System.Windows.Forms.ToolStripStatusLabel();
             this.stsOTProgress = new System.Windows.Forms.ToolStripProgressBar();
             this.btnAccountBalance = new System.Windows.Forms.Button();
@@ -80,8 +81,6 @@ namespace BitmexBot
             this.label6 = new System.Windows.Forms.Label();
             this.lblOverTimeSummary = new System.Windows.Forms.Label();
             this.btnOverTimeStop = new System.Windows.Forms.Button();
-            this.btnBulkTest = new System.Windows.Forms.Button();
-            this.btnBulkShift = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.lblMA2 = new System.Windows.Forms.Label();
             this.nudMA2 = new System.Windows.Forms.NumericUpDown();
@@ -112,7 +111,6 @@ namespace BitmexBot
             this.label14 = new System.Windows.Forms.Label();
             this.chkPumpdump = new System.Windows.Forms.CheckBox();
             this.dgvCandles = new System.Windows.Forms.DataGridView();
-            this.stsAPIValid = new System.Windows.Forms.ToolStripStatusLabel();
             this.lblBuildVersion = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.nudQty)).BeginInit();
             this.gbCandles.SuspendLayout();
@@ -571,6 +569,12 @@ namespace BitmexBot
             this.statusStrip1.Text = "statusStrip1";
             this.statusStrip1.UseWaitCursor = true;
             // 
+            // stsAPIValid
+            // 
+            this.stsAPIValid.Name = "stsAPIValid";
+            this.stsAPIValid.Size = new System.Drawing.Size(164, 25);
+            this.stsAPIValid.Text = "API keys are invalid";
+            // 
             // stsAccountBalance
             // 
             this.stsAccountBalance.Name = "stsAccountBalance";
@@ -829,30 +833,6 @@ namespace BitmexBot
             this.btnOverTimeStop.UseVisualStyleBackColor = true;
             this.btnOverTimeStop.UseWaitCursor = true;
             this.btnOverTimeStop.Click += new System.EventHandler(this.btnOverTimeStop_Click);
-            // 
-            // btnBulkTest
-            // 
-            this.btnBulkTest.Location = new System.Drawing.Point(867, 108);
-            this.btnBulkTest.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.btnBulkTest.Name = "btnBulkTest";
-            this.btnBulkTest.Size = new System.Drawing.Size(112, 35);
-            this.btnBulkTest.TabIndex = 32;
-            this.btnBulkTest.Text = "BulkTest";
-            this.btnBulkTest.UseVisualStyleBackColor = true;
-            this.btnBulkTest.UseWaitCursor = true;
-            this.btnBulkTest.Click += new System.EventHandler(this.btnBulkTest_Click);
-            // 
-            // btnBulkShift
-            // 
-            this.btnBulkShift.Location = new System.Drawing.Point(867, 155);
-            this.btnBulkShift.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.btnBulkShift.Name = "btnBulkShift";
-            this.btnBulkShift.Size = new System.Drawing.Size(112, 35);
-            this.btnBulkShift.TabIndex = 33;
-            this.btnBulkShift.Text = "Bulk Shift";
-            this.btnBulkShift.UseVisualStyleBackColor = true;
-            this.btnBulkShift.UseWaitCursor = true;
-            this.btnBulkShift.Click += new System.EventHandler(this.btnBulkShift_Click);
             // 
             // groupBox2
             // 
@@ -1260,14 +1240,14 @@ namespace BitmexBot
             this.dgvCandles.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.dgvCandles.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.dgvCandles.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.dgvCandles.DefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dgvCandles.DefaultCellStyle = dataGridViewCellStyle2;
             this.dgvCandles.Location = new System.Drawing.Point(15, 443);
             this.dgvCandles.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.dgvCandles.Name = "dgvCandles";
@@ -1276,12 +1256,6 @@ namespace BitmexBot
             this.dgvCandles.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
             this.dgvCandles.Size = new System.Drawing.Size(1840, 314);
             this.dgvCandles.TabIndex = 39;
-            // 
-            // stsAPIValid
-            // 
-            this.stsAPIValid.Name = "stsAPIValid";
-            this.stsAPIValid.Size = new System.Drawing.Size(164, 25);
-            this.stsAPIValid.Text = "API keys are invalid";
             // 
             // lblBuildVersion
             // 
@@ -1303,8 +1277,6 @@ namespace BitmexBot
             this.Controls.Add(this.groupBox4);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
-            this.Controls.Add(this.btnBulkShift);
-            this.Controls.Add(this.btnBulkTest);
             this.Controls.Add(this.btnOverTimeStop);
             this.Controls.Add(this.lblOverTimeSummary);
             this.Controls.Add(this.label6);
@@ -1423,8 +1395,6 @@ namespace BitmexBot
         private System.Windows.Forms.Label lblOverTimeSummary;
         private System.Windows.Forms.ToolStripProgressBar stsOTProgress;
         private System.Windows.Forms.Button btnOverTimeStop;
-        private System.Windows.Forms.Button btnBulkTest;
-        private System.Windows.Forms.Button btnBulkShift;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.Label lblMA2;
         private System.Windows.Forms.NumericUpDown nudMA2;
