@@ -695,9 +695,41 @@ namespace BitmexBot
             }
             else if (rdoSwitch.Checked)
             {
+                if (chkMA.Checked)
+                {
+                    if ((Candles[1].MA1 > Candles[1].MA2) && (Candles[2].MA1 <= Candles[2].MA2)) // Most recently closed candle crossed over up
+                    {
+                        // Did the last full candle have MA1 cross above MA2?  Triggers a buy in switch setting.
+                        Mode = "Buy";
+
+                        if (checkPumpAndDump(CandlesHistory, Candles))
+                        {
+                            Mode = "Wait";
+                        }
+                    }
+                    else if ((Candles[1].MA1 < Candles[1].MA2) && (Candles[2].MA1 >= Candles[2].MA2))
+                    {
+                        // Did the last full candle have MA1 cross below MA2?  Triggers a sell in switch setting
+                        Mode = "Sell";
+
+                        if (checkPumpAndDump(CandlesHistory, Candles))
+                        {
+                            Mode = "Wait";
+                        }
+                    }
+                    else if ((Candles[1].MA1 > Candles[1].MA2) && (Candles[2].MA1 > Candles[2].MA2))
+                    {
+                        // If no crossover, is MA1 still above MA2? Keep long position open, close any shorts if they are still open.
+                        Mode = "CloseShortsAndWait";
+                    }
+                    else if ((Candles[1].MA1 < Candles[1].MA2) && (Candles[2].MA1 < Candles[2].MA2))
+                    {
+                        // If no crossover, is MA1 still below MA2? Keep short position open, close any longs if they are still open.
+                        Mode = "CloseLongsAndWait";
+                    }
+                }
                 if (cbEma.Checked)
                 {
-                    //NEW
                     if ((Candles[1].EMA1 > Candles[1].EMA2) && (Candles[2].EMA1 <= Candles[2].EMA2)) // Most recently closed candle crossed over up
                     {
                         // Did the last full candle have MA1 cross above MA2?  Triggers a buy in switch setting.
@@ -797,134 +829,6 @@ namespace BitmexBot
                     else if (crossedDown && (Candles[1].MA1 < Candles[1].MA2) &&
                         (Candles[2].MA1 >= Candles[2].MA2) &&
                         (Candles[1].STOCHK > stochSell)) 
-                    {
-                        // Did the last full candle have MA1 cross below MA2?  Triggers a sell in switch setting
-                        Mode = "Sell";
-
-                        if (checkPumpAndDump(CandlesHistory, Candles))
-                        {
-                            Mode = "Wait";
-                        }
-                    }
-                    else if ((Candles[1].MA1 > Candles[1].MA2) && (Candles[2].MA1 > Candles[2].MA2))
-                    {
-                        // If no crossover, is MA1 still above MA2? Keep long position open, close any shorts if they are still open.
-                        Mode = "CloseShortsAndWait";
-                    }
-                    else if ((Candles[1].MA1 < Candles[1].MA2) && (Candles[2].MA1 < Candles[2].MA2))
-                    {
-                        // If no crossover, is MA1 still below MA2? Keep short position open, close any longs if they are still open.
-                        Mode = "CloseLongsAndWait";
-                    }
-                }
-                if (cbEma.Checked && cbRSI.Checked)
-                {
-                    //NEW
-                    if ((Candles[1].EMA1 > Candles[1].EMA2) && 
-                        (Candles[2].EMA1 <= Candles[2].EMA2) && 
-                        (Candles[1].RSI > rsiBuy) &&
-                        (Candles[2].RSI <= rsiBuy)) // Most recently closed candle crossed over up
-                    {
-                        // Did the last full candle have MA1 cross above MA2?  Triggers a buy in switch setting.
-                        Mode = "Buy";
-
-                        if (checkPumpAndDump(CandlesHistory, Candles))
-                        {
-                            Mode = "Wait";
-                        }
-                    }
-                    else if ((Candles[1].EMA1 < Candles[1].EMA2) && 
-                        (Candles[2].EMA1 >= Candles[2].EMA2) && 
-                        (Candles[1].RSI < rsiSell) &&
-                        (Candles[2].RSI >= rsiSell))
-                    {
-                        // Did the last full candle have MA1 cross below MA2?  Triggers a sell in switch setting
-                        Mode = "Sell";
-
-                        if (checkPumpAndDump(CandlesHistory, Candles))
-                        {
-                            Mode = "Wait";
-                        }
-                    }
-                    else if ((Candles[1].EMA1 > Candles[1].EMA2) && (Candles[2].EMA1 > Candles[2].EMA2))
-                    {
-                        // If no crossover, is MA1 still above MA2? Keep long position open, close any shorts if they are still open.
-                        Mode = "CloseShortsAndWait";
-                    }
-                    else if ((Candles[1].EMA1 < Candles[1].EMA2) && (Candles[2].EMA1 < Candles[2].EMA2))
-                    {
-                        // If no crossover, is MA1 still below MA2? Keep short position open, close any longs if they are still open.
-                        Mode = "CloseLongsAndWait";
-                    }
-                }
-                if (cbEma.Checked && cbRSI.Checked && cbStochastic.Checked)
-                {
-                    bool crossedUp = false;
-                    bool crossedDown = false;
-
-                    if ((Candles[1].STOCHK < Candles[1].STOCHD) && (Candles[2].STOCHK > Candles[2].STOCHD))
-                    {
-                        crossedDown = true;
-                    }
-                    else if ((Candles[1].STOCHK > Candles[1].STOCHD) && (Candles[2].STOCHK < Candles[2].STOCHD))
-                    {
-                        crossedUp = true;
-                    }
-
-                    //NEW
-                    if ((Candles[1].EMA1 > Candles[1].EMA2) &&
-                        (Candles[2].EMA1 <= Candles[2].EMA2) &&
-                        (Candles[1].RSI > rsiBuy) &&
-                        (Candles[2].RSI <= rsiBuy) && crossedUp &&
-                        (Candles[1].STOCHK < stochBuy))
-                    {
-                        // Did the last full candle have MA1 cross above MA2?  Triggers a buy in switch setting.
-                        Mode = "Buy";
-
-                        if (checkPumpAndDump(CandlesHistory, Candles))
-                        {
-                            Mode = "Wait";
-                        }
-                    }
-                    else if ((Candles[1].EMA1 < Candles[1].EMA2) && 
-                        (Candles[2].EMA1 >= Candles[2].EMA2) && 
-                        (Candles[1].RSI < rsiSell) &&
-                        (Candles[2].RSI >= rsiSell) && crossedDown &&
-                        (Candles[1].STOCHK > stochSell))
-                    {
-                        // Did the last full candle have MA1 cross below MA2?  Triggers a sell in switch setting
-                        Mode = "Sell";
-
-                        if (checkPumpAndDump(CandlesHistory, Candles))
-                        {
-                            Mode = "Wait";
-                        }
-                    }
-                    else if ((Candles[1].EMA1 > Candles[1].EMA2) && (Candles[2].EMA1 > Candles[2].EMA2))
-                    {
-                        // If no crossover, is MA1 still above MA2? Keep long position open, close any shorts if they are still open.
-                        Mode = "CloseShortsAndWait";
-                    }
-                    else if ((Candles[1].EMA1 < Candles[1].EMA2) && (Candles[2].EMA1 < Candles[2].EMA2))
-                    {
-                        // If no crossover, is MA1 still below MA2? Keep short position open, close any longs if they are still open.
-                        Mode = "CloseLongsAndWait";
-                    }
-                }
-                else
-                {
-                    //NEW
-                    if ((Candles[1].MA1 > Candles[1].MA2) && (Candles[2].MA1 <= Candles[2].MA2)) // Most recently closed candle crossed over up
-                    {
-                        // Did the last full candle have MA1 cross above MA2?  Triggers a buy in switch setting.
-                        Mode = "Buy";
-
-                        if (checkPumpAndDump(CandlesHistory, Candles))
-                        {
-                            Mode = "Wait";
-                        }
-                    }
-                    else if ((Candles[1].MA1 < Candles[1].MA2) && (Candles[2].MA1 >= Candles[2].MA2))
                     {
                         // Did the last full candle have MA1 cross below MA2?  Triggers a sell in switch setting
                         Mode = "Sell";
