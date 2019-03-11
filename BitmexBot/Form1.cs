@@ -906,7 +906,6 @@ namespace BitmexBot
         {
             OpenPositions = bitmex.GetOpenPositions(ActiveInstrument.Symbol);
             OpenOrders = bitmex.GetOpenOrders(ActiveInstrument.Symbol);
-            
 
             if (chkAutoMarketTakeProfits.Checked && OpenPositions.Any() && Mode != "Sell" && Mode != "Buy") // See if we are taking profits on open positions, and have positions open and we aren't in our buy or sell periods
             {
