@@ -113,6 +113,13 @@ namespace BitmexBot
             this.chkPumpdump = new System.Windows.Forms.CheckBox();
             this.dgvCandles = new System.Windows.Forms.DataGridView();
             this.lblBuildVersion = new System.Windows.Forms.Label();
+            this.groupBox7 = new System.Windows.Forms.GroupBox();
+            this.nuLeverageLevel = new System.Windows.Forms.NumericUpDown();
+            this.label16 = new System.Windows.Forms.Label();
+            this.btnLeverage = new System.Windows.Forms.Button();
+            this.chkStoploss = new System.Windows.Forms.CheckBox();
+            this.label17 = new System.Windows.Forms.Label();
+            this.nuStoploss = new System.Windows.Forms.NumericUpDown();
             ((System.ComponentModel.ISupportInitialize)(this.nudQty)).BeginInit();
             this.gbCandles.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -139,6 +146,9 @@ namespace BitmexBot
             this.groupBox6.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nuPumpPercentage)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvCandles)).BeginInit();
+            this.groupBox7.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nuLeverageLevel)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nuStoploss)).BeginInit();
             this.SuspendLayout();
             // 
             // btnBuy
@@ -360,6 +370,9 @@ namespace BitmexBot
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.chkStoploss);
+            this.groupBox1.Controls.Add(this.label17);
+            this.groupBox1.Controls.Add(this.nuStoploss);
             this.groupBox1.Controls.Add(this.chkDiversification);
             this.groupBox1.Controls.Add(this.label13);
             this.groupBox1.Controls.Add(this.nuDiversification);
@@ -377,7 +390,7 @@ namespace BitmexBot
             this.groupBox1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.groupBox1.Size = new System.Drawing.Size(521, 210);
+            this.groupBox1.Size = new System.Drawing.Size(521, 222);
             this.groupBox1.TabIndex = 14;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Automated Trading";
@@ -385,7 +398,7 @@ namespace BitmexBot
             // chkDiversification
             // 
             this.chkDiversification.AutoSize = true;
-            this.chkDiversification.Location = new System.Drawing.Point(10, 157);
+            this.chkDiversification.Location = new System.Drawing.Point(10, 184);
             this.chkDiversification.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.chkDiversification.Name = "chkDiversification";
             this.chkDiversification.Size = new System.Drawing.Size(133, 24);
@@ -397,7 +410,7 @@ namespace BitmexBot
             // label13
             // 
             this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(311, 162);
+            this.label13.Location = new System.Drawing.Point(311, 186);
             this.label13.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(23, 20);
@@ -408,15 +421,10 @@ namespace BitmexBot
             // nuDiversification
             // 
             this.nuDiversification.DecimalPlaces = 2;
-            this.nuDiversification.Increment = new decimal(new int[] {
-            1,
-            0,
-            0,
-            131072});
-            this.nuDiversification.Location = new System.Drawing.Point(204, 160);
+            this.nuDiversification.Location = new System.Drawing.Point(204, 184);
             this.nuDiversification.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.nuDiversification.Maximum = new decimal(new int[] {
-            1000000,
+            this.nuDiversification.Minimum = new decimal(new int[] {
+            1,
             0,
             0,
             0});
@@ -443,7 +451,7 @@ namespace BitmexBot
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(311, 122);
+            this.label1.Location = new System.Drawing.Point(311, 120);
             this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(181, 20);
@@ -1187,7 +1195,6 @@ namespace BitmexBot
             this.ddlPumpDumpTime.Size = new System.Drawing.Size(98, 28);
             this.ddlPumpDumpTime.TabIndex = 32;
             this.ddlPumpDumpTime.UseWaitCursor = true;
-            this.ddlPumpDumpTime.SelectedIndex = 0;
             // 
             // label15
             // 
@@ -1276,11 +1283,110 @@ namespace BitmexBot
             this.lblBuildVersion.Size = new System.Drawing.Size(0, 20);
             this.lblBuildVersion.TabIndex = 40;
             // 
+            // groupBox7
+            // 
+            this.groupBox7.Controls.Add(this.btnLeverage);
+            this.groupBox7.Controls.Add(this.label16);
+            this.groupBox7.Controls.Add(this.nuLeverageLevel);
+            this.groupBox7.Location = new System.Drawing.Point(856, 106);
+            this.groupBox7.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.groupBox7.Name = "groupBox7";
+            this.groupBox7.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.groupBox7.Size = new System.Drawing.Size(280, 209);
+            this.groupBox7.TabIndex = 41;
+            this.groupBox7.TabStop = false;
+            this.groupBox7.Text = "Leverage";
+            // 
+            // nuLeverageLevel
+            // 
+            this.nuLeverageLevel.Location = new System.Drawing.Point(12, 31);
+            this.nuLeverageLevel.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.nuLeverageLevel.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.nuLeverageLevel.Name = "nuLeverageLevel";
+            this.nuLeverageLevel.Size = new System.Drawing.Size(114, 26);
+            this.nuLeverageLevel.TabIndex = 19;
+            this.nuLeverageLevel.Value = new decimal(new int[] {
+            100,
+            0,
+            0,
+            0});
+            // 
+            // label16
+            // 
+            this.label16.Location = new System.Drawing.Point(8, 73);
+            this.label16.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(264, 123);
+            this.label16.TabIndex = 25;
+            this.label16.Text = "Leverage value. Send a number between 1 and 100 to enable isolated margin with a " +
+    "fixed leverage. Send 0 to enable cross margin.";
+            this.label16.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // btnLeverage
+            // 
+            this.btnLeverage.Location = new System.Drawing.Point(149, 26);
+            this.btnLeverage.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.btnLeverage.Name = "btnLeverage";
+            this.btnLeverage.Size = new System.Drawing.Size(112, 35);
+            this.btnLeverage.TabIndex = 32;
+            this.btnLeverage.Text = "Ok";
+            this.btnLeverage.UseVisualStyleBackColor = true;
+            this.btnLeverage.UseWaitCursor = true;
+            this.btnLeverage.Click += new System.EventHandler(this.btnLeverage_Click);
+            // 
+            // chkStoploss
+            // 
+            this.chkStoploss.AutoSize = true;
+            this.chkStoploss.Location = new System.Drawing.Point(10, 150);
+            this.chkStoploss.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.chkStoploss.Name = "chkStoploss";
+            this.chkStoploss.Size = new System.Drawing.Size(97, 24);
+            this.chkStoploss.TabIndex = 27;
+            this.chkStoploss.Text = "Stoploss";
+            this.chkStoploss.UseVisualStyleBackColor = true;
+            this.chkStoploss.UseWaitCursor = true;
+            // 
+            // label17
+            // 
+            this.label17.AutoSize = true;
+            this.label17.Location = new System.Drawing.Point(311, 152);
+            this.label17.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label17.Name = "label17";
+            this.label17.Size = new System.Drawing.Size(23, 20);
+            this.label17.TabIndex = 26;
+            this.label17.Text = "%";
+            this.label17.UseWaitCursor = true;
+            // 
+            // nuStoploss
+            // 
+            this.nuStoploss.DecimalPlaces = 2;
+            this.nuStoploss.Location = new System.Drawing.Point(204, 150);
+            this.nuStoploss.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.nuStoploss.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.nuStoploss.Name = "nuStoploss";
+            this.nuStoploss.Size = new System.Drawing.Size(90, 26);
+            this.nuStoploss.TabIndex = 25;
+            this.nuStoploss.UseWaitCursor = true;
+            this.nuStoploss.Value = new decimal(new int[] {
+            20,
+            0,
+            0,
+            0});
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1879, 882);
+            this.Controls.Add(this.groupBox7);
             this.Controls.Add(this.lblBuildVersion);
             this.Controls.Add(this.dgvCandles);
             this.Controls.Add(this.groupBox6);
@@ -1355,6 +1461,9 @@ namespace BitmexBot
             this.groupBox6.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nuPumpPercentage)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvCandles)).EndInit();
+            this.groupBox7.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.nuLeverageLevel)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nuStoploss)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1442,6 +1551,13 @@ namespace BitmexBot
         private System.Windows.Forms.ToolStripStatusLabel stsAPIValid;
         private System.Windows.Forms.Label lblBuildVersion;
         private System.Windows.Forms.CheckBox chkMA;
+        private System.Windows.Forms.GroupBox groupBox7;
+        private System.Windows.Forms.Button btnLeverage;
+        private System.Windows.Forms.Label label16;
+        private System.Windows.Forms.NumericUpDown nuLeverageLevel;
+        private System.Windows.Forms.CheckBox chkStoploss;
+        private System.Windows.Forms.Label label17;
+        private System.Windows.Forms.NumericUpDown nuStoploss;
     }
 }
 

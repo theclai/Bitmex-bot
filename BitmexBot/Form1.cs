@@ -1634,5 +1634,11 @@ namespace BitmexBot
 
             //lblBuildVersion.Text = productVersion.ToString();
         }
+
+        private void btnLeverage_Click(object sender, EventArgs e)
+        {
+            double leverage = Convert.ToDouble(nuLeverageLevel.Value);
+            bitmex.Leverage(ActiveInstrument.Symbol, leverage);
+        }
     }
 }

@@ -22,11 +22,13 @@ namespace BitmexBoConsole
         {
             BitMEXApi bitmex = new BitMEXApi(bitmexKey, bitmexSecret);
             // var orderBook = bitmex.GetOrderBook("XBTUSD", 3);
-            var orders = bitmex.GetOrders();
+            //var orders = bitmex.GetOrders();
 
-            bitmex.PostOrders();
+            var leverage = bitmex.Leverage("XBTUSD", 100);
+            //bitmex.PostOrders();
+           
             // var orders = bitmex.DeleteOrders();
-            Console.WriteLine(orders);
+            //Console.WriteLine(orders);
 
             Console.ReadKey();
         }
