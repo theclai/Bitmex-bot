@@ -118,6 +118,7 @@ namespace BitmexBot
             ddlCandleTimes.SelectedIndex = 0;
             ddlPumpDumpTime.SelectedIndex = 0;
             ddlAutoOrderType.SelectedIndex = 0;
+            lblLeverageResult.Text = "";
             LoadAPISettings();
         }
 
@@ -944,6 +945,30 @@ namespace BitmexBot
                 }
             }
 
+            if (chkStoploss.Checked && OpenPositions.Any() && Mode != "Sell" && Mode != "Buy") // See if we are taking profits on open positions, and have positions open and we aren't in our buy or sell periods
+            {
+                lblAutoUnrealizedROEPercent.Text = Math.Round((Convert.ToDouble(OpenPositions[0].UnrealisedRoePcnt * 100)), 2).ToString();
+                // Did we meet our profit threshold yet?
+                if (Convert.ToDouble(OpenPositions[0].UnrealisedRoePcnt * 100) <= Convert.ToDouble(nuStoploss.Value))
+                {
+                    // Make a market order to close out the position, also cancel all orders so nothing else fills if we had unfilled limit orders still open.
+                    string Side = "Sell";
+                    int Quantity = 0;
+
+                    if (OpenPositions[0].CurrentQty > 0)
+                    {
+                        Side = "Sell";
+                        Quantity = Convert.ToInt32(OpenPositions[0].CurrentQty);
+                    }
+                    
+                    bitmex.MarketOrder(ActiveInstrument.Symbol, Side, Quantity);
+
+                    // Get our positions and orders again to be able to process rest of logic with new information.
+                    OpenPositions = bitmex.GetOpenPositions(ActiveInstrument.Symbol);
+                    OpenOrders = bitmex.GetOpenOrders(ActiveInstrument.Symbol);
+                }
+            }
+
             if (rdoBuy.Checked)
             {
                 switch (Mode)
@@ -1624,21 +1649,16 @@ namespace BitmexBot
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            //Version version = Assembly.GetExecutingAssembly().GetName().Version;
-            //Text = Text + " " + version.Major + "." + version.Minor + " (build " + version.Build + ")"; //change form title
             var version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
             this.Text = String.Format("Bitmex bot {0}", version);
-
-            //string productVersion = System.Windows.Forms.Application.ProductVersion;
-            //this.Text = String.Format("Bitmex bot {0}", productVersion);
-
-            //lblBuildVersion.Text = productVersion.ToString();
         }
 
         private void btnLeverage_Click(object sender, EventArgs e)
         {
             double leverage = Convert.ToDouble(nuLeverageLevel.Value);
-            bitmex.Leverage(ActiveInstrument.Symbol, leverage);
+            var leverageResult = bitmex.Leverage(ActiveInstrument.Symbol, leverage);
+
+            lblLeverageResult.Text = string.Format("Leverage set to: {0}", leverageResult.Leverage.ToString());
         }
     }
 }
