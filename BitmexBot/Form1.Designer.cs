@@ -117,10 +117,10 @@ namespace BitmexBot
             this.dgvCandles = new System.Windows.Forms.DataGridView();
             this.lblBuildVersion = new System.Windows.Forms.Label();
             this.groupBox7 = new System.Windows.Forms.GroupBox();
+            this.lblLeverageResult = new System.Windows.Forms.Label();
             this.btnLeverage = new System.Windows.Forms.Button();
             this.label16 = new System.Windows.Forms.Label();
             this.nuLeverageLevel = new System.Windows.Forms.NumericUpDown();
-            this.lblLeverageResult = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.nudQty)).BeginInit();
             this.gbCandles.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -1337,10 +1337,19 @@ namespace BitmexBot
             this.groupBox7.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.groupBox7.Name = "groupBox7";
             this.groupBox7.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.groupBox7.Size = new System.Drawing.Size(280, 209);
+            this.groupBox7.Size = new System.Drawing.Size(280, 221);
             this.groupBox7.TabIndex = 41;
             this.groupBox7.TabStop = false;
             this.groupBox7.Text = "Leverage";
+            // 
+            // lblLeverageResult
+            // 
+            this.lblLeverageResult.AutoSize = true;
+            this.lblLeverageResult.Location = new System.Drawing.Point(8, 187);
+            this.lblLeverageResult.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblLeverageResult.Name = "lblLeverageResult";
+            this.lblLeverageResult.Size = new System.Drawing.Size(34, 20);
+            this.lblLeverageResult.TabIndex = 33;
             // 
             // btnLeverage
             // 
@@ -1382,15 +1391,6 @@ namespace BitmexBot
             0,
             0,
             0});
-            // 
-            // lblLeverageResult
-            // 
-            this.lblLeverageResult.AutoSize = true;
-            this.lblLeverageResult.Location = new System.Drawing.Point(10, 183);
-            this.lblLeverageResult.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.lblLeverageResult.Name = "lblLeverageResult";
-            this.lblLeverageResult.Size = new System.Drawing.Size(0, 20);
-            this.lblLeverageResult.TabIndex = 33;
             // 
             // Form1
             // 
