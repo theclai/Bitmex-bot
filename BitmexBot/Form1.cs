@@ -1651,6 +1651,29 @@ namespace BitmexBot
         {
             var version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
             this.Text = String.Format("Bitmex bot {0}", version);
+
+            float widthRatio = Screen.PrimaryScreen.Bounds.Width / 1280;
+            float heightRatio = Screen.PrimaryScreen.Bounds.Height / 800f;
+            SizeF scale = new SizeF(widthRatio, heightRatio);
+            this.Scale(scale);
+            foreach (Control control in this.Controls)
+            {
+                control.Font = new Font("Verdana", control.Font.SizeInPoints * heightRatio * widthRatio);
+            }
+
+            Rectangle resolutionRect = System.Windows.Forms.Screen.FromControl(this).Bounds;
+            if (this.Width >= resolutionRect.Width || this.Height >= resolutionRect.Height)
+            {
+                this.WindowState = FormWindowState.Maximized;
+            }
+
+            for (int i = 0; i < dgvCandles.Columns.Count; i++)
+            {
+                dgvCandles.Columns[i].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+                int colw = dgvCandles.Columns[i].Width;
+                dgvCandles.Columns[i].AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+                dgvCandles.Columns[i].Width = colw;
+            }
         }
 
         private void btnLeverage_Click(object sender, EventArgs e)
@@ -1659,6 +1682,14 @@ namespace BitmexBot
             var leverageResult = bitmex.Leverage(ActiveInstrument.Symbol, leverage);
 
             lblLeverageResult.Text = string.Format("Leverage set to: {0}", leverageResult.Leverage.ToString());
+        }
+
+        private void dgvCandles_SizeChanged(object sender, EventArgs e)
+        {
+            foreach (DataGridViewRow row in dgvCandles.Rows)
+            {
+                row.Height = (dgvCandles.ClientRectangle.Height - dgvCandles.ColumnHeadersHeight) / dgvCandles.Rows.Count;
+            }
         }
     }
 }
