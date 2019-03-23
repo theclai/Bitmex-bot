@@ -399,7 +399,7 @@ namespace BitmexBot
             // chkStoploss
             // 
             this.chkStoploss.AutoSize = true;
-            this.chkStoploss.Location = new System.Drawing.Point(10, 158);
+            this.chkStoploss.Location = new System.Drawing.Point(10, 160);
             this.chkStoploss.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.chkStoploss.Name = "chkStoploss";
             this.chkStoploss.Size = new System.Drawing.Size(97, 24);
@@ -411,7 +411,7 @@ namespace BitmexBot
             // label17
             // 
             this.label17.AutoSize = true;
-            this.label17.Location = new System.Drawing.Point(328, 160);
+            this.label17.Location = new System.Drawing.Point(333, 162);
             this.label17.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label17.Name = "label17";
             this.label17.Size = new System.Drawing.Size(23, 20);
@@ -422,7 +422,7 @@ namespace BitmexBot
             // nuStoploss
             // 
             this.nuStoploss.DecimalPlaces = 2;
-            this.nuStoploss.Location = new System.Drawing.Point(221, 158);
+            this.nuStoploss.Location = new System.Drawing.Point(226, 160);
             this.nuStoploss.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.nuStoploss.Minimum = new decimal(new int[] {
             1,
@@ -454,7 +454,7 @@ namespace BitmexBot
             // label13
             // 
             this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(328, 198);
+            this.label13.Location = new System.Drawing.Point(333, 198);
             this.label13.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(23, 20);
@@ -465,7 +465,7 @@ namespace BitmexBot
             // nuDiversification
             // 
             this.nuDiversification.DecimalPlaces = 2;
-            this.nuDiversification.Location = new System.Drawing.Point(221, 196);
+            this.nuDiversification.Location = new System.Drawing.Point(226, 196);
             this.nuDiversification.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.nuDiversification.Minimum = new decimal(new int[] {
             1,
@@ -485,7 +485,7 @@ namespace BitmexBot
             // lblAutoUnrealizedROEPercent
             // 
             this.lblAutoUnrealizedROEPercent.AutoSize = true;
-            this.lblAutoUnrealizedROEPercent.Location = new System.Drawing.Point(302, 140);
+            this.lblAutoUnrealizedROEPercent.Location = new System.Drawing.Point(307, 140);
             this.lblAutoUnrealizedROEPercent.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblAutoUnrealizedROEPercent.Name = "lblAutoUnrealizedROEPercent";
             this.lblAutoUnrealizedROEPercent.Size = new System.Drawing.Size(0, 20);
@@ -495,7 +495,7 @@ namespace BitmexBot
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(328, 128);
+            this.label1.Location = new System.Drawing.Point(333, 128);
             this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(181, 20);
@@ -511,7 +511,7 @@ namespace BitmexBot
             0,
             0,
             131072});
-            this.nudAutoMarketTakeProfitPercent.Location = new System.Drawing.Point(222, 124);
+            this.nudAutoMarketTakeProfitPercent.Location = new System.Drawing.Point(227, 124);
             this.nudAutoMarketTakeProfitPercent.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.nudAutoMarketTakeProfitPercent.Maximum = new decimal(new int[] {
             1000000,
@@ -1300,6 +1300,7 @@ namespace BitmexBot
             this.dgvCandles.AllowUserToAddRows = false;
             this.dgvCandles.AllowUserToDeleteRows = false;
             this.dgvCandles.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.dgvCandles.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.AllCells;
             this.dgvCandles.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.dgvCandles.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;

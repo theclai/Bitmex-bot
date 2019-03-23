@@ -10,12 +10,14 @@ using System.Windows.Forms;
 using MaterialSkin;
 using MaterialSkin.Controls;
 using System.Reflection;
+using System.Threading;
 
 namespace BitmexBot
 {
     public partial class Form1 : MaterialForm
     {
         private readonly MaterialSkinManager materialSkinManager;
+        private readonly SynchronizationContext synchronizationContext;
 
         // IMPORTANT - Enter your API Key information below
 
@@ -97,6 +99,7 @@ namespace BitmexBot
         public Form1()
         {
             InitializeComponent();
+            synchronizationContext = SynchronizationContext.Current;
 
             // Initialize MaterialSkinManager
             materialSkinManager = MaterialSkinManager.Instance;
@@ -108,7 +111,6 @@ namespace BitmexBot
             InitializeAPI();
             InitializeCandleArea();
             InitializeOverTime();
-
         }
 
         private void InitializeDropdownsAndSettings()
@@ -162,7 +164,6 @@ namespace BitmexBot
             // We must do this in case symbols are different on test and real net
             GetAPIValidity(); // Validate API keys by checking and displaying account balance.
             InitializeSymbolInformation();
-
         }
 
         private void InitializeSymbolInformation()
@@ -294,16 +295,14 @@ namespace BitmexBot
             ActiveInstrument = bitmex.GetInstrument(((Instrument)ddlSymbol.SelectedItem).Symbol)[0];
         }
 
-        private void UpdateCandles()
+        private void UpdateCandles(int hour, string candleTime)
         {
-            int hour = Convert.ToInt32(ddlPumpDumpTime.SelectedItem.ToString());
-
             // Get candles
-            Candles = bitmex.GetCandleHistory(ActiveInstrument.Symbol, 500, ddlCandleTimes.SelectedItem.ToString());
+            Candles = bitmex.GetCandleHistory(ActiveInstrument.Symbol, 500, candleTime);
             Candles = Candles.OrderBy(a => a.TimeStamp).ToList();
 
             // Get candles for check pump and dump
-            CandlesHistory = bitmex.GetCandleHistory(ActiveInstrument.Symbol, 1, ddlCandleTimes.SelectedItem.ToString(), 
+            CandlesHistory = bitmex.GetCandleHistory(ActiveInstrument.Symbol, 1, candleTime, 
                 DateTime.UtcNow.AddHours(-hour), DateTime.UtcNow);
 
             CandlesHistory = CandlesHistory.OrderBy(c => c.TimeStamp).ToList();
@@ -627,14 +626,24 @@ namespace BitmexBot
             Candles = Candles.OrderByDescending(a => a.TimeStamp).ToList();
 
             //// Show Candles
-            dgvCandles.DataSource = Candles;
+            //dgvCandles.DataSource = Candles;
+
+            synchronizationContext.Post(new SendOrPostCallback(o =>
+            {
+                dgvCandles.DataSource = o;
+            }), Candles);
 
             // This is where we are going to determine the "mode" of the bot based on MAs, trades happen on another timer
             if (Running)//We could set this up to also ignore setting bot mode if we've already reviewed current candles
                       //  However, if you wanted to use info from the most current candle, that wouldn't work well
             {
                 SetBotMode();  // We really only need to set bot mode if the bot is running
-                btnAutomatedTrading.Text = "Stop - " + Mode;// so we can see what the mode of the bot is while running
+                //btnAutomatedTrading.Text = "Stop - " + Mode;// so we can see what the mode of the bot is while running
+
+                synchronizationContext.Post(new SendOrPostCallback(o =>
+                {
+                    btnAutomatedTrading.Text = "Stop - " + o;
+                }), Mode);
             }
         }
 
@@ -764,10 +773,9 @@ namespace BitmexBot
                 }
                 if (cbRSI.Checked)
                 {
-                    if ((Candles[1].MA1 > Candles[1].MA2) &&
-                      (Candles[2].MA1 <= Candles[2].MA2) &&
-                      (Candles[1].RSI > rsiBuy) &&
-                      (Candles[2].RSI <= rsiBuy)) // Most recently closed candle crossed over up
+                    //oversold 
+                    if ((Candles[1].MA1 > Candles[1].MA2) && (Candles[2].MA1 <= Candles[2].MA2) && (Candles[0].RSI <= rsiBuy))
+                       // Most recently closed candle crossed over up
                     {
                         // Did the last full candle have MA1 cross above MA2?  Triggers a buy in switch setting.
                         Mode = "Buy";
@@ -776,11 +784,8 @@ namespace BitmexBot
                         {
                             Mode = "Wait";
                         }
-                    }
-                    else if ((Candles[1].MA1 < Candles[1].MA2) &&
-                        (Candles[2].MA1 >= Candles[2].MA2) &&
-                        (Candles[1].RSI < rsiSell) &&
-                        (Candles[2].RSI >= rsiSell))
+                    } // overbought
+                    else if ((Candles[1].MA1 < Candles[1].MA2) && (Candles[2].MA1 >= Candles[2].MA2) && (Candles[0].RSI >= rsiSell))
                     {
                         // Did the last full candle have MA1 cross below MA2?  Triggers a sell in switch setting
                         Mode = "Sell";
@@ -789,16 +794,6 @@ namespace BitmexBot
                         {
                             Mode = "Wait";
                         }
-                    }
-                    else if ((Candles[1].MA1 > Candles[1].MA2) && (Candles[2].MA1 > Candles[2].MA2))
-                    {
-                        // If no crossover, is MA1 still above MA2? Keep long position open, close any shorts if they are still open.
-                        Mode = "CloseShortsAndWait";
-                    }
-                    else if ((Candles[1].MA1 < Candles[1].MA2) && (Candles[2].MA1 < Candles[2].MA2))
-                    {
-                        // If no crossover, is MA1 still below MA2? Keep short position open, close any longs if they are still open.
-                        Mode = "CloseLongsAndWait";
                     }
                 }
                 if (cbStochastic.Checked)
@@ -839,25 +834,21 @@ namespace BitmexBot
                             Mode = "Wait";
                         }
                     }
-                    else if ((Candles[1].MA1 > Candles[1].MA2) && (Candles[2].MA1 > Candles[2].MA2))
-                    {
-                        // If no crossover, is MA1 still above MA2? Keep long position open, close any shorts if they are still open.
-                        Mode = "CloseShortsAndWait";
-                    }
-                    else if ((Candles[1].MA1 < Candles[1].MA2) && (Candles[2].MA1 < Candles[2].MA2))
-                    {
-                        // If no crossover, is MA1 still below MA2? Keep short position open, close any longs if they are still open.
-                        Mode = "CloseLongsAndWait";
-                    }
                 }
             }
         }
 
-        private void tmrCandleUpdater_Tick(object sender, EventArgs e)
+        private async void tmrCandleUpdater_Tick(object sender, EventArgs e)
         {
+            int hour = Convert.ToInt32(ddlPumpDumpTime.SelectedItem.ToString());
+            string candleTime = ddlCandleTimes.SelectedItem.ToString();
+
             if (chkUpdateCandles.Checked)
             {
-                UpdateCandles();
+                await Task.Run(() => 
+                {
+                    UpdateCandles(hour, candleTime);
+                });
             }
         }
 
@@ -875,7 +866,10 @@ namespace BitmexBot
 
         private void ddlCandleTimes_SelectedIndexChanged(object sender, EventArgs e)
         {
-            UpdateCandles();
+            int hour = Convert.ToInt32(ddlPumpDumpTime.SelectedItem.ToString());
+            string candleTime = ddlCandleTimes.SelectedItem.ToString();
+
+            UpdateCandles(hour, candleTime);
         }
 
         private void btnAutomatedTrading_Click(object sender, EventArgs e)
@@ -1369,24 +1363,20 @@ namespace BitmexBot
         {
             try // Code is simple, if we get our account balance without an error the API is valid, if not, it will throw an error and API will be marked not valid.
             {
+                WalletBalance = bitmex.GetAccountBalance();
 
-                var task = Task.Run(() =>
+                if (WalletBalance >= 0)
                 {
-
-                    WalletBalance = bitmex.GetAccountBalance();
-                    if (WalletBalance >= 0)
-                    {
-                        APIValid = true;
-                        stsAPIValid.Text = "API keys are valid";
-                        stsAccountBalance.Text = "Balance: " + WalletBalance.ToString();
-                    }
-                    else
-                    {
-                        APIValid = false;
-                        stsAPIValid.Text = "API keys are invalid";
-                        stsAccountBalance.Text = "Balance: 0";
-                    }
-                });
+                    APIValid = true;
+                    stsAPIValid.Text = "API keys are valid";
+                    stsAccountBalance.Text = "Balance: " + WalletBalance.ToString();
+                }
+                else
+                {
+                    APIValid = false;
+                    stsAPIValid.Text = "API keys are invalid";
+                    stsAccountBalance.Text = "Balance: 0";
+                }
 
             }
             catch (Exception ex)
@@ -1641,16 +1631,28 @@ namespace BitmexBot
                 double currentPrice = currentCandles[0].Close.Value;
 
                 if (currentPrice >= prevPricePump)
-                    return false;
+                    return true;
             }
 
-            return true;
+            return false;
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            var version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
-            this.Text = String.Format("Bitmex bot {0}", version);
+            string version = Application.ProductVersion;
+
+            if (System.Deployment.Application.ApplicationDeployment.IsNetworkDeployed)
+            {
+                Version ver = System.Deployment.Application.ApplicationDeployment.CurrentDeployment.CurrentVersion;
+                this.Text = string.Format("Bitmex bot {0}.{1}.{2}.{3}", ver.Major, ver.Minor, ver.Build, ver.Revision);
+            }
+            else
+            {
+                this.Text = string.Format("Bitmex bot {0}", version);
+            }
+
+            //var version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+            //this.Text = String.Format("Bitmex bot {0}", version);
 
             float widthRatio = Screen.PrimaryScreen.Bounds.Width / 1280;
             float heightRatio = Screen.PrimaryScreen.Bounds.Height / 800f;
