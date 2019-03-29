@@ -44,8 +44,6 @@ namespace BitmexBot
             this.gbCandles = new System.Windows.Forms.GroupBox();
             this.chkUpdateCandles = new System.Windows.Forms.CheckBox();
             this.tmrCandleUpdater = new System.Windows.Forms.Timer(this.components);
-            this.rdoBuy = new System.Windows.Forms.RadioButton();
-            this.rdoSell = new System.Windows.Forms.RadioButton();
             this.rdoSwitch = new System.Windows.Forms.RadioButton();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.chkStoploss = new System.Windows.Forms.CheckBox();
@@ -328,32 +326,6 @@ namespace BitmexBot
             this.tmrCandleUpdater.Interval = 10000;
             this.tmrCandleUpdater.Tick += new System.EventHandler(this.tmrCandleUpdater_Tick);
             // 
-            // rdoBuy
-            // 
-            this.rdoBuy.AutoSize = true;
-            this.rdoBuy.Location = new System.Drawing.Point(237, 20);
-            this.rdoBuy.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.rdoBuy.Name = "rdoBuy";
-            this.rdoBuy.Size = new System.Drawing.Size(61, 24);
-            this.rdoBuy.TabIndex = 11;
-            this.rdoBuy.Text = "Buy";
-            this.rdoBuy.UseVisualStyleBackColor = true;
-            this.rdoBuy.UseWaitCursor = true;
-            this.rdoBuy.Visible = false;
-            // 
-            // rdoSell
-            // 
-            this.rdoSell.AutoSize = true;
-            this.rdoSell.Location = new System.Drawing.Point(237, 48);
-            this.rdoSell.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.rdoSell.Name = "rdoSell";
-            this.rdoSell.Size = new System.Drawing.Size(60, 24);
-            this.rdoSell.TabIndex = 12;
-            this.rdoSell.Text = "Sell";
-            this.rdoSell.UseVisualStyleBackColor = true;
-            this.rdoSell.UseWaitCursor = true;
-            this.rdoSell.Visible = false;
-            // 
             // rdoSwitch
             // 
             this.rdoSwitch.AutoSize = true;
@@ -384,9 +356,7 @@ namespace BitmexBot
             this.groupBox1.Controls.Add(this.ddlAutoOrderType);
             this.groupBox1.Controls.Add(this.nudAutoQuantity);
             this.groupBox1.Controls.Add(this.btnAutomatedTrading);
-            this.groupBox1.Controls.Add(this.rdoSell);
             this.groupBox1.Controls.Add(this.rdoSwitch);
-            this.groupBox1.Controls.Add(this.rdoBuy);
             this.groupBox1.Location = new System.Drawing.Point(1328, 126);
             this.groupBox1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.groupBox1.Name = "groupBox1";
@@ -1496,8 +1466,6 @@ namespace BitmexBot
         private System.Windows.Forms.GroupBox gbCandles;
         private System.Windows.Forms.Timer tmrCandleUpdater;
         private System.Windows.Forms.CheckBox chkUpdateCandles;
-        private System.Windows.Forms.RadioButton rdoBuy;
-        private System.Windows.Forms.RadioButton rdoSell;
         private System.Windows.Forms.RadioButton rdoSwitch;
         private System.Windows.Forms.GroupBox groupBox1;
         private MaterialSkin.Controls.MaterialRaisedButton btnAutomatedTrading;
