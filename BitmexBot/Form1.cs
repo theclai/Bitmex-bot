@@ -107,10 +107,7 @@ namespace BitmexBot
             materialSkinManager.Theme = MaterialSkinManager.Themes.LIGHT;
             materialSkinManager.ColorScheme = new ColorScheme(Primary.BlueGrey800, Primary.BlueGrey900, Primary.BlueGrey500, Accent.LightBlue200, TextShade.WHITE);
 
-            InitializeDropdownsAndSettings();
-            InitializeAPI();
-            InitializeCandleArea();
-            InitializeOverTime();
+            this.Load += new EventHandler(Form1_Load);
         }
 
         private void InitializeDropdownsAndSettings()
@@ -628,22 +625,22 @@ namespace BitmexBot
             //// Show Candles
             //dgvCandles.DataSource = Candles;
 
-            synchronizationContext.Post(new SendOrPostCallback(o =>
-            {
-                dgvCandles.DataSource = o;
-            }), Candles);
+            //synchronizationContext.Post(new SendOrPostCallback(o =>
+            //{
+            //    dgvCandles.DataSource = o;
+            //}), Candles);
 
             // This is where we are going to determine the "mode" of the bot based on MAs, trades happen on another timer
             if (Running)//We could set this up to also ignore setting bot mode if we've already reviewed current candles
                       //  However, if you wanted to use info from the most current candle, that wouldn't work well
             {
                 SetBotMode();  // We really only need to set bot mode if the bot is running
-                //btnAutomatedTrading.Text = "Stop - " + Mode;// so we can see what the mode of the bot is while running
+                btnAutomatedTrading.Text = "Stop - " + Mode;// so we can see what the mode of the bot is while running
 
-                synchronizationContext.Post(new SendOrPostCallback(o =>
-                {
-                    btnAutomatedTrading.Text = "Stop - " + o;
-                }), Mode);
+                //synchronizationContext.Post(new SendOrPostCallback(o =>
+                //{
+                //    btnAutomatedTrading.Text = "Stop - " + o;
+                //}), Mode);
             }
         }
 
@@ -725,7 +722,7 @@ namespace BitmexBot
                 if (cbRSI.Checked)
                 {
                     //oversold 
-                    if ((Candles[0].RSI <= rsiBuy))
+                    if ((Candles[0].RSI <= rsiBuy) && (Candles[1].RSI <= rsiBuy) && (Candles[2].RSI <= rsiBuy))
                        // Most recently closed candle crossed over up
                     {
                         // Did the last full candle have MA1 cross above MA2?  Triggers a buy in switch setting.
@@ -736,7 +733,7 @@ namespace BitmexBot
                             Mode = "Wait";
                         }
                     } // overbought
-                    else if ((Candles[0].RSI >= rsiSell))
+                    else if ((Candles[0].RSI >= rsiSell)&& (Candles[1].RSI >= rsiSell) && (Candles[2].RSI >= rsiSell))
                     {
                         // Did the last full candle have MA1 cross below MA2?  Triggers a sell in switch setting
                         Mode = "Sell";
@@ -745,6 +742,16 @@ namespace BitmexBot
                         {
                             Mode = "Wait";
                         }
+                    }
+                    else if ((Candles[1].MA1 > Candles[1].MA2) && (Candles[2].MA1 > Candles[2].MA2))
+                    {
+                        // If no crossover, is MA1 still above MA2? Keep long position open, close any shorts if they are still open.
+                        Mode = "CloseShortsAndWait";
+                    }
+                    else if ((Candles[1].MA1 < Candles[1].MA2) && (Candles[2].MA1 < Candles[2].MA2))
+                    {
+                        // If no crossover, is MA1 still below MA2? Keep short position open, close any longs if they are still open.
+                        Mode = "CloseLongsAndWait";
                     }
                 }
                 if (cbStochastic.Checked)
@@ -785,6 +792,16 @@ namespace BitmexBot
                             Mode = "Wait";
                         }
                     }
+                    else if ((Candles[1].MA1 > Candles[1].MA2) && (Candles[2].MA1 > Candles[2].MA2))
+                    {
+                        // If no crossover, is MA1 still above MA2? Keep long position open, close any shorts if they are still open.
+                        Mode = "CloseShortsAndWait";
+                    }
+                    else if ((Candles[1].MA1 < Candles[1].MA2) && (Candles[2].MA1 < Candles[2].MA2))
+                    {
+                        // If no crossover, is MA1 still below MA2? Keep short position open, close any longs if they are still open.
+                        Mode = "CloseLongsAndWait";
+                    }
                 }
                 if (chkMA.Checked && cbEma.Checked)
                 {
@@ -814,6 +831,16 @@ namespace BitmexBot
                             Mode = "Wait";
                         }
                     }
+                    else if ((Candles[1].MA1 > Candles[1].MA2) && (Candles[2].MA1 > Candles[2].MA2))
+                    {
+                        // If no crossover, is MA1 still above MA2? Keep long position open, close any shorts if they are still open.
+                        Mode = "CloseShortsAndWait";
+                    }
+                    else if ((Candles[1].MA1 < Candles[1].MA2) && (Candles[2].MA1 < Candles[2].MA2))
+                    {
+                        // If no crossover, is MA1 still below MA2? Keep short position open, close any longs if they are still open.
+                        Mode = "CloseLongsAndWait";
+                    }
                 }
                 if (chkMA.Checked && cbEma.Checked && cbRSI.Checked)
                 {
@@ -821,7 +848,7 @@ namespace BitmexBot
                         (Candles[2].MA1 <= Candles[2].MA2) &&
                         (Candles[1].EMA1 > Candles[1].EMA2) &&
                         (Candles[2].EMA1 <= Candles[2].EMA2) &&
-                        (Candles[0].RSI <= rsiBuy)) 
+                        (Candles[1].RSI <= rsiBuy)) 
                     {
                         // Did the last full candle have MA1 cross above MA2?  Triggers a buy in switch setting.
                         Mode = "Buy";
@@ -835,7 +862,7 @@ namespace BitmexBot
                         (Candles[2].MA1 >= Candles[2].MA2) &&
                         (Candles[1].EMA1 < Candles[1].EMA2) &&
                         (Candles[2].EMA1 >= Candles[2].EMA2) &&
-                        (Candles[0].RSI >= rsiSell))
+                        (Candles[1].RSI >= rsiSell))
                     {
                         // Did the last full candle have MA1 cross below MA2?  Triggers a sell in switch setting
                         Mode = "Sell";
@@ -844,6 +871,16 @@ namespace BitmexBot
                         {
                             Mode = "Wait";
                         }
+                    }
+                    else if ((Candles[1].MA1 > Candles[1].MA2) && (Candles[2].MA1 > Candles[2].MA2))
+                    {
+                        // If no crossover, is MA1 still above MA2? Keep long position open, close any shorts if they are still open.
+                        Mode = "CloseShortsAndWait";
+                    }
+                    else if ((Candles[1].MA1 < Candles[1].MA2) && (Candles[2].MA1 < Candles[2].MA2))
+                    {
+                        // If no crossover, is MA1 still below MA2? Keep short position open, close any longs if they are still open.
+                        Mode = "CloseLongsAndWait";
                     }
                 }
                 if (chkMA.Checked && cbEma.Checked && cbRSI.Checked && cbStochastic.Checked)
@@ -864,7 +901,7 @@ namespace BitmexBot
                         (Candles[2].MA1 <= Candles[2].MA2) &&
                         (Candles[1].EMA1 > Candles[1].EMA2) &&
                         (Candles[2].EMA1 <= Candles[2].EMA2) &&
-                        (Candles[0].RSI <= rsiBuy) &&
+                        (Candles[1].RSI <= rsiBuy) &&
                         (Candles[1].STOCHK < stochBuy && crossedUp))
                     {
                         // Did the last full candle have MA1 cross above MA2?  Triggers a buy in switch setting.
@@ -879,7 +916,7 @@ namespace BitmexBot
                         (Candles[2].MA1 >= Candles[2].MA2) &&
                         (Candles[1].EMA1 < Candles[1].EMA2) &&
                         (Candles[2].EMA1 >= Candles[2].EMA2) &&
-                        (Candles[0].RSI >= rsiSell) &&
+                        (Candles[1].RSI >= rsiSell) &&
                         (Candles[1].STOCHK > stochSell && crossedDown))
                     {
                         // Did the last full candle have MA1 cross below MA2?  Triggers a sell in switch setting
@@ -890,12 +927,22 @@ namespace BitmexBot
                             Mode = "Wait";
                         }
                     }
+                    else if ((Candles[1].MA1 > Candles[1].MA2) && (Candles[2].MA1 > Candles[2].MA2))
+                    {
+                        // If no crossover, is MA1 still above MA2? Keep long position open, close any shorts if they are still open.
+                        Mode = "CloseShortsAndWait";
+                    }
+                    else if ((Candles[1].MA1 < Candles[1].MA2) && (Candles[2].MA1 < Candles[2].MA2))
+                    {
+                        // If no crossover, is MA1 still below MA2? Keep short position open, close any longs if they are still open.
+                        Mode = "CloseLongsAndWait";
+                    }
                 }
                 if (chkMA.Checked && cbRSI.Checked)
                 {
                     if ((Candles[1].MA1 > Candles[1].MA2) &&
                         (Candles[2].MA1 <= Candles[2].MA2) &&
-                        (Candles[0].RSI <= rsiBuy))
+                        (Candles[1].RSI <= rsiBuy))
                     {
                         // Did the last full candle have MA1 cross above MA2?  Triggers a buy in switch setting.
                         Mode = "Buy";
@@ -907,7 +954,7 @@ namespace BitmexBot
                     }
                     else if ((Candles[1].MA1 < Candles[1].MA2) &&
                         (Candles[2].MA1 >= Candles[2].MA2) &&
-                        (Candles[0].RSI >= rsiSell))
+                        (Candles[1].RSI >= rsiSell))
                     {
                         // Did the last full candle have MA1 cross below MA2?  Triggers a sell in switch setting
                         Mode = "Sell";
@@ -916,6 +963,16 @@ namespace BitmexBot
                         {
                             Mode = "Wait";
                         }
+                    }
+                    else if ((Candles[1].MA1 > Candles[1].MA2) && (Candles[2].MA1 > Candles[2].MA2))
+                    {
+                        // If no crossover, is MA1 still above MA2? Keep long position open, close any shorts if they are still open.
+                        Mode = "CloseShortsAndWait";
+                    }
+                    else if ((Candles[1].MA1 < Candles[1].MA2) && (Candles[2].MA1 < Candles[2].MA2))
+                    {
+                        // If no crossover, is MA1 still below MA2? Keep short position open, close any longs if they are still open.
+                        Mode = "CloseLongsAndWait";
                     }
                 }
                 if (chkMA.Checked && cbStochastic.Checked)
@@ -946,7 +1003,7 @@ namespace BitmexBot
                     }
                     else if ((Candles[1].MA1 < Candles[1].MA2) &&
                         (Candles[2].MA1 >= Candles[2].MA2) &&
-                        (Candles[0].RSI >= rsiSell) &&
+                        (Candles[1].RSI >= rsiSell) &&
                         (Candles[1].STOCHK > stochSell && crossedDown))
                     {
                         // Did the last full candle have MA1 cross below MA2?  Triggers a sell in switch setting
@@ -956,6 +1013,16 @@ namespace BitmexBot
                         {
                             Mode = "Wait";
                         }
+                    }
+                    else if ((Candles[1].MA1 > Candles[1].MA2) && (Candles[2].MA1 > Candles[2].MA2))
+                    {
+                        // If no crossover, is MA1 still above MA2? Keep long position open, close any shorts if they are still open.
+                        Mode = "CloseShortsAndWait";
+                    }
+                    else if ((Candles[1].MA1 < Candles[1].MA2) && (Candles[2].MA1 < Candles[2].MA2))
+                    {
+                        // If no crossover, is MA1 still below MA2? Keep short position open, close any longs if they are still open.
+                        Mode = "CloseLongsAndWait";
                     }
                 }
                 if (chkMA.Checked && cbRSI.Checked && cbStochastic.Checked)
@@ -974,7 +1041,7 @@ namespace BitmexBot
 
                     if ((Candles[1].MA1 > Candles[1].MA2) &&
                         (Candles[2].MA1 <= Candles[2].MA2) &&
-                        (Candles[0].RSI <= rsiBuy) &&
+                        (Candles[1].RSI <= rsiBuy) &&
                         (Candles[1].STOCHK < stochBuy && crossedUp))
                     {
                         // Did the last full candle have MA1 cross above MA2?  Triggers a buy in switch setting.
@@ -987,7 +1054,7 @@ namespace BitmexBot
                     }
                     else if ((Candles[1].MA1 < Candles[1].MA2) &&
                         (Candles[2].MA1 >= Candles[2].MA2) &&
-                        (Candles[0].RSI >= rsiSell) &&
+                        (Candles[1].RSI >= rsiSell) &&
                         (Candles[1].STOCHK > stochSell && crossedDown))
                     {
                         // Did the last full candle have MA1 cross below MA2?  Triggers a sell in switch setting
@@ -998,12 +1065,22 @@ namespace BitmexBot
                             Mode = "Wait";
                         }
                     }
+                    else if ((Candles[1].MA1 > Candles[1].MA2) && (Candles[2].MA1 > Candles[2].MA2))
+                    {
+                        // If no crossover, is MA1 still above MA2? Keep long position open, close any shorts if they are still open.
+                        Mode = "CloseShortsAndWait";
+                    }
+                    else if ((Candles[1].MA1 < Candles[1].MA2) && (Candles[2].MA1 < Candles[2].MA2))
+                    {
+                        // If no crossover, is MA1 still below MA2? Keep short position open, close any longs if they are still open.
+                        Mode = "CloseLongsAndWait";
+                    }
                 }
                 if (cbEma.Checked && cbRSI.Checked)
                 {
                     if ((Candles[1].EMA1 > Candles[1].EMA2) &&
                         (Candles[2].EMA1 <= Candles[2].EMA2) &&
-                        (Candles[0].RSI <= rsiBuy))
+                        (Candles[1].RSI <= rsiBuy))
                        
                     {
                         // Did the last full candle have MA1 cross above MA2?  Triggers a buy in switch setting.
@@ -1016,7 +1093,7 @@ namespace BitmexBot
                     }
                     else if ((Candles[1].EMA1 < Candles[1].EMA2) &&
                         (Candles[2].EMA1 >= Candles[2].EMA2) &&
-                        (Candles[0].RSI >= rsiSell))
+                        (Candles[1].RSI >= rsiSell))
                        
                     {
                         // Did the last full candle have MA1 cross below MA2?  Triggers a sell in switch setting
@@ -1026,6 +1103,16 @@ namespace BitmexBot
                         {
                             Mode = "Wait";
                         }
+                    }
+                    else if ((Candles[1].MA1 > Candles[1].MA2) && (Candles[2].MA1 > Candles[2].MA2))
+                    {
+                        // If no crossover, is MA1 still above MA2? Keep long position open, close any shorts if they are still open.
+                        Mode = "CloseShortsAndWait";
+                    }
+                    else if ((Candles[1].MA1 < Candles[1].MA2) && (Candles[2].MA1 < Candles[2].MA2))
+                    {
+                        // If no crossover, is MA1 still below MA2? Keep short position open, close any longs if they are still open.
+                        Mode = "CloseLongsAndWait";
                     }
                 }
                 if (cbEma.Checked && cbStochastic.Checked)
@@ -1066,6 +1153,16 @@ namespace BitmexBot
                             Mode = "Wait";
                         }
                     }
+                    else if ((Candles[1].MA1 > Candles[1].MA2) && (Candles[2].MA1 > Candles[2].MA2))
+                    {
+                        // If no crossover, is MA1 still above MA2? Keep long position open, close any shorts if they are still open.
+                        Mode = "CloseShortsAndWait";
+                    }
+                    else if ((Candles[1].MA1 < Candles[1].MA2) && (Candles[2].MA1 < Candles[2].MA2))
+                    {
+                        // If no crossover, is MA1 still below MA2? Keep short position open, close any longs if they are still open.
+                        Mode = "CloseLongsAndWait";
+                    }
                 }
                 if (cbEma.Checked && cbRSI.Checked && cbStochastic.Checked)
                 {
@@ -1083,7 +1180,7 @@ namespace BitmexBot
 
                     if ((Candles[1].EMA1 > Candles[1].EMA2) &&
                         (Candles[2].EMA1 <= Candles[2].EMA2) &&
-                        (Candles[0].RSI <= rsiBuy) &&
+                        (Candles[1].RSI <= rsiBuy) &&
                         (Candles[1].STOCHK < stochBuy && crossedUp))
                     {
                         // Did the last full candle have MA1 cross above MA2?  Triggers a buy in switch setting.
@@ -1096,7 +1193,7 @@ namespace BitmexBot
                     }
                     else if ((Candles[1].EMA1 < Candles[1].EMA2) &&
                             (Candles[2].EMA1 >= Candles[2].EMA2) &&
-                            (Candles[0].RSI >= rsiSell) &&
+                            (Candles[1].RSI >= rsiSell) &&
                             (Candles[1].STOCHK > stochSell && crossedDown))
                     {
                         // Did the last full candle have MA1 cross below MA2?  Triggers a sell in switch setting
@@ -1107,21 +1204,32 @@ namespace BitmexBot
                             Mode = "Wait";
                         }
                     }
+                    else if ((Candles[1].MA1 > Candles[1].MA2) && (Candles[2].MA1 > Candles[2].MA2))
+                    {
+                        // If no crossover, is MA1 still above MA2? Keep long position open, close any shorts if they are still open.
+                        Mode = "CloseShortsAndWait";
+                    }
+                    else if ((Candles[1].MA1 < Candles[1].MA2) && (Candles[2].MA1 < Candles[2].MA2))
+                    {
+                        // If no crossover, is MA1 still below MA2? Keep short position open, close any longs if they are still open.
+                        Mode = "CloseLongsAndWait";
+                    }
                 }
             }
         }
 
-        private async void tmrCandleUpdater_Tick(object sender, EventArgs e)
+        private void tmrCandleUpdater_Tick(object sender, EventArgs e)
         {
             int hour = Convert.ToInt32(ddlPumpDumpTime.SelectedItem.ToString());
             string candleTime = ddlCandleTimes.SelectedItem.ToString();
 
             if (chkUpdateCandles.Checked)
             {
-                await Task.Run(() => 
-                {
-                    UpdateCandles(hour, candleTime);
-                });
+                UpdateCandles(hour, candleTime);
+                //await Task.Run(() => 
+                //{
+                //    UpdateCandles(hour, candleTime);
+                //});
             }
         }
 
@@ -1739,13 +1847,12 @@ namespace BitmexBot
                 this.Text = string.Format("Bitmex bot {0}", version);
             }
 
-            //var version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
-            //this.Text = String.Format("Bitmex bot {0}", version);
-
             float widthRatio = Screen.PrimaryScreen.Bounds.Width / 1280;
             float heightRatio = Screen.PrimaryScreen.Bounds.Height / 800f;
             SizeF scale = new SizeF(widthRatio, heightRatio);
+
             this.Scale(scale);
+
             foreach (Control control in this.Controls)
             {
                 control.Font = new Font("Verdana", control.Font.SizeInPoints * heightRatio * widthRatio);
@@ -1757,13 +1864,18 @@ namespace BitmexBot
                 this.WindowState = FormWindowState.Maximized;
             }
 
-            for (int i = 0; i < dgvCandles.Columns.Count; i++)
-            {
-                dgvCandles.Columns[i].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
-                int colw = dgvCandles.Columns[i].Width;
-                dgvCandles.Columns[i].AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
-                dgvCandles.Columns[i].Width = colw;
-            }
+            InitializeDropdownsAndSettings();
+            InitializeAPI();
+            InitializeCandleArea();
+            InitializeOverTime();
+
+            //for (int i = 0; i < dgvCandles.Columns.Count; i++)
+            //{
+            //    dgvCandles.Columns[i].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            //    int colw = dgvCandles.Columns[i].Width;
+            //    dgvCandles.Columns[i].AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+            //    dgvCandles.Columns[i].Width = colw;
+            //}
         }
 
         private void btnLeverage_Click(object sender, EventArgs e)
@@ -1774,12 +1886,12 @@ namespace BitmexBot
             lblLeverageResult.Text = string.Format("Leverage set to: {0}", leverageResult.Leverage.ToString());
         }
 
-        private void dgvCandles_SizeChanged(object sender, EventArgs e)
-        {
-            foreach (DataGridViewRow row in dgvCandles.Rows)
-            {
-                row.Height = (dgvCandles.ClientRectangle.Height - dgvCandles.ColumnHeadersHeight) / dgvCandles.Rows.Count;
-            }
-        }
+        //private void dgvCandles_SizeChanged(object sender, EventArgs e)
+        //{
+        //    foreach (DataGridViewRow row in dgvCandles.Rows)
+        //    {
+        //        row.Height = (dgvCandles.ClientRectangle.Height - dgvCandles.ColumnHeadersHeight) / dgvCandles.Rows.Count;
+        //    }
+        //}
     }
 }
