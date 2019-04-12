@@ -118,7 +118,6 @@ namespace BitmexBot
             ddlPumpDumpTime.SelectedIndex = 0;
             ddlAutoOrderType.SelectedIndex = 0;
             lblLeverageResult.Text = "";
-            LoadAPISettings();
         }
 
         private void LoadAPISettings()
@@ -1292,6 +1291,7 @@ namespace BitmexBot
                     if (OpenPositions[0].CurrentQty > 0)
                     {
                         Side = "Sell";
+
                         Quantity = Convert.ToInt32(OpenPositions[0].CurrentQty);
                     }
                     else if (OpenPositions[0].CurrentQty < 0)
@@ -1420,6 +1420,8 @@ namespace BitmexBot
                             }
                             else
                             {
+                                Thread.Sleep(TimeSpan.FromMinutes(1));
+
                                 if (chkDiversification.Checked)
                                 {
                                     AutoMakeOrder("Buy", qtyByPercentage);
@@ -1847,16 +1849,16 @@ namespace BitmexBot
                 this.Text = string.Format("Bitmex bot {0}", version);
             }
 
-            float widthRatio = Screen.PrimaryScreen.Bounds.Width / 1280;
-            float heightRatio = Screen.PrimaryScreen.Bounds.Height / 800f;
-            SizeF scale = new SizeF(widthRatio, heightRatio);
+            //float widthRatio = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Width / 1280f; //Screen.PrimaryScreen.Bounds.Width / 1280;
+            //float heightRatio = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Height / 800f;//Screen.PrimaryScreen.Bounds.Height / 800f;
+            //SizeF scale = new SizeF(widthRatio, heightRatio);
 
-            this.Scale(scale);
+            //this.Scale(scale);
 
-            foreach (Control control in this.Controls)
-            {
-                control.Font = new Font("Verdana", control.Font.SizeInPoints * heightRatio * widthRatio);
-            }
+            //foreach (Control control in this.Controls)
+            //{
+            //    control.Font = new Font("Verdana", control.Font.SizeInPoints * heightRatio * widthRatio);
+            //}
 
             Rectangle resolutionRect = System.Windows.Forms.Screen.FromControl(this).Bounds;
             if (this.Width >= resolutionRect.Width || this.Height >= resolutionRect.Height)
@@ -1865,6 +1867,7 @@ namespace BitmexBot
             }
 
             InitializeDropdownsAndSettings();
+            LoadAPISettings();
             InitializeAPI();
             InitializeCandleArea();
             InitializeOverTime();
