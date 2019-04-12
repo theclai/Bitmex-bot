@@ -7,6 +7,7 @@ using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace BitmexBot
 {
@@ -162,6 +163,72 @@ namespace BitmexBot
                 }
             }
         }
+
+        private async Task<string> QueryAsync(string method, string function, Dictionary<string, string> param = null, bool auth = false, bool json = false)
+        {
+            string paramData = json ? BuildJSON(param) : BuildQueryData(param);
+            string url = "/api/v1" + function + ((method == "GET" && paramData != "") ? "?" + paramData : "");
+            string postData = (method != "GET") ? paramData : "";
+
+            String responseText = await Task.Run(() =>
+            {
+                HttpWebRequest webRequest = (HttpWebRequest)WebRequest.Create(domain + url);
+                webRequest.Method = method;
+
+                if (auth)
+                {
+                    string nonce = GetNonce().ToString();
+                    string message2 = method + url + nonce + postData;
+                    string expires = GetExpiresArg();
+                    string message = method + url + expires + postData;
+                    byte[] signatureBytes = hmacsha256(Encoding.UTF8.GetBytes(apiSecret), Encoding.UTF8.GetBytes(message));
+                    string signatureString = ByteArrayToString(signatureBytes);
+
+                    //webRequest.Headers.Add("api-nonce", nonce);
+                    webRequest.Headers.Add("api-expires", expires);
+                    webRequest.Headers.Add("api-key", apiKey);
+                    webRequest.Headers.Add("api-signature", signatureString);
+                }
+
+                try
+                {
+                    if (postData != "")
+                    {
+                        webRequest.ContentType = json ? "application/json" : "application/x-www-form-urlencoded";
+                        var data = Encoding.UTF8.GetBytes(postData);
+                        using (var stream = webRequest.GetRequestStream())
+                        {
+                            stream.Write(data, 0, data.Length);
+                        }
+                    }
+
+                    using (WebResponse webResponse = webRequest.GetResponse())
+                    using (Stream str = webResponse.GetResponseStream())
+                    using (StreamReader sr = new StreamReader(str))
+                    {
+                        return sr.ReadToEnd();
+                    }
+                }
+                catch (WebException wex)
+                {
+                    using (HttpWebResponse response = (HttpWebResponse)wex.Response)
+                    {
+                        if (response == null)
+                            throw;
+
+                        using (Stream str = response.GetResponseStream())
+                        {
+                            using (StreamReader sr = new StreamReader(str))
+                            {
+                                return sr.ReadToEnd();
+                            }
+                        }
+                    }
+                }
+            });
+
+            return responseText;
+        }
         #endregion
 
         #region Our Calls
@@ -171,6 +238,16 @@ namespace BitmexBot
             param["symbol"] = symbol;
             param["depth"] = depth.ToString();
             string res = Query("GET", "/orderBook/L2", param);
+            return JsonConvert.DeserializeObject<List<OrderBook>>(res);
+        }
+
+        public async Task<List<OrderBook>> GetOrderBookAsync(string symbol, int depth)
+        {
+            var param = new Dictionary<string, string>();
+            param["symbol"] = symbol;
+            param["depth"] = depth.ToString();
+            string res = await QueryAsync("GET", "/orderBook/L2", param);
+
             return JsonConvert.DeserializeObject<List<OrderBook>>(res);
         }
 

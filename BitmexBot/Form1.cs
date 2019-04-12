@@ -107,7 +107,7 @@ namespace BitmexBot
             materialSkinManager.Theme = MaterialSkinManager.Themes.LIGHT;
             materialSkinManager.ColorScheme = new ColorScheme(Primary.BlueGrey800, Primary.BlueGrey900, Primary.BlueGrey500, Accent.LightBlue200, TextShade.WHITE);
 
-            this.Load += new EventHandler(Form1_Load);
+            //this.Load += new EventHandler(Form1_Load);
         }
 
         private void InitializeDropdownsAndSettings()
