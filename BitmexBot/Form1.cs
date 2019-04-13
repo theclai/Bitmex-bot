@@ -1420,15 +1420,16 @@ namespace BitmexBot
                             }
                             else
                             {
-                                Thread.Sleep(TimeSpan.FromMinutes(1));
-
-                                if (chkDiversification.Checked)
+                                if (!OpenOrders.Any())
                                 {
-                                    AutoMakeOrder("Buy", qtyByPercentage);
-                                }
-                                else
-                                {
-                                    AutoMakeOrder("Buy", Convert.ToInt32(nudAutoQuantity.Value));
+                                    if (chkDiversification.Checked)
+                                    {
+                                        AutoMakeOrder("Buy", qtyByPercentage);
+                                    }
+                                    else
+                                    {
+                                        AutoMakeOrder("Buy", Convert.ToInt32(nudAutoQuantity.Value));
+                                    }
                                 }
                             }
                         }
@@ -1462,28 +1463,28 @@ namespace BitmexBot
                                 }
                             }
                         }
-                        else
-                        {
-                            if (OpenOrders.Any())
-                            {
-                                // If we have an open order, edit it
-                                if (OpenOrders.Any(a => a.Side == "Buy"))
-                                {
-                                    // We still have an open Sell order, cancel that order, make a new Buy order
-                                    string result = bitmex.CancelAllOpenOrders(ActiveInstrument.Symbol);
-                                    AutoMakeOrder("Sell", Convert.ToInt32(nudAutoQuantity.Value));
-                                }
-                                else if (OpenOrders.Any(a => a.Side == "Sell"))
-                                {
-                                    // Edit our only open order, code should not allow for more than 1 at a time for now
-                                    string result = bitmex.EditOrderPrice(OpenOrders[0].OrderId, CalculateMakerOrderPrice("Sell"));
-                                }
-                            }
-                            else
-                            {
-                                AutoMakeOrder("Sell", Convert.ToInt32(nudAutoQuantity.Value));
-                            }
-                        }
+                        //else
+                        //{
+                        //    if (OpenOrders.Any())
+                        //    {
+                        //        // If we have an open order, edit it
+                        //        if (OpenOrders.Any(a => a.Side == "Buy"))
+                        //        {
+                        //            // We still have an open Sell order, cancel that order, make a new Buy order
+                        //            string result = bitmex.CancelAllOpenOrders(ActiveInstrument.Symbol);
+                        //            AutoMakeOrder("Sell", Convert.ToInt32(nudAutoQuantity.Value));
+                        //        }
+                        //        else if (OpenOrders.Any(a => a.Side == "Sell"))
+                        //        {
+                        //            // Edit our only open order, code should not allow for more than 1 at a time for now
+                        //            string result = bitmex.EditOrderPrice(OpenOrders[0].OrderId, CalculateMakerOrderPrice("Sell"));
+                        //        }
+                        //    }
+                        //    else
+                        //    {
+                        //        AutoMakeOrder("Sell", Convert.ToInt32(nudAutoQuantity.Value));
+                        //    }
+                        //}
                         break;
                     case "CloseLongsAndWait":
                         if (OpenPositions.Any())
