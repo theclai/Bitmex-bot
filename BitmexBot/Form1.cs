@@ -1463,28 +1463,7 @@ namespace BitmexBot
                                 }
                             }
                         }
-                        //else
-                        //{
-                        //    if (OpenOrders.Any())
-                        //    {
-                        //        // If we have an open order, edit it
-                        //        if (OpenOrders.Any(a => a.Side == "Buy"))
-                        //        {
-                        //            // We still have an open Sell order, cancel that order, make a new Buy order
-                        //            string result = bitmex.CancelAllOpenOrders(ActiveInstrument.Symbol);
-                        //            AutoMakeOrder("Sell", Convert.ToInt32(nudAutoQuantity.Value));
-                        //        }
-                        //        else if (OpenOrders.Any(a => a.Side == "Sell"))
-                        //        {
-                        //            // Edit our only open order, code should not allow for more than 1 at a time for now
-                        //            string result = bitmex.EditOrderPrice(OpenOrders[0].OrderId, CalculateMakerOrderPrice("Sell"));
-                        //        }
-                        //    }
-                        //    else
-                        //    {
-                        //        AutoMakeOrder("Sell", Convert.ToInt32(nudAutoQuantity.Value));
-                        //    }
-                        //}
+                       
                         break;
                     case "CloseLongsAndWait":
                         if (OpenPositions.Any())
@@ -1737,17 +1716,6 @@ namespace BitmexBot
 
         private void btnBulkTest_Click(object sender, EventArgs e)
         {
-            //string orders = "[{\"orderQty\": 89, \"price\": 9479, \"side\": \"Sell\", \"symbol\": \"XBTUSD\"}," +
-            //    " { \"orderQty\": 143, \"price\": 9527, \"side\": \"Sell\", \"symbol\": \"XBTUSD\"}," +
-            //    " { \"orderQty\": 231, \"price\": 9605, \"side\": \"Sell\", \"symbol\": \"XBTUSD\"}," +
-            //    " { \"orderQty\": 374, \"price\": 9731, \"side\": \"Sell\", \"symbol\": \"XBTUSD\"}," +
-            //    " { \"orderQty\": 605, \"price\": 9935, \"side\": \"Sell\", \"symbol\": \"XBTUSD\"}," +
-            //    " { \"orderQty\": 978, \"price\": 10266, \"side\": \"Sell\", \"symbol\": \"XBTUSD\"}," +
-            //    " { \"orderQty\": 1583, \"price\": 10800, \"side\": \"Sell\", \"symbol\": \"XBTUSD\"}]";
-            //bitmex.BulkOrder(orders);
-
-
-
             List<Order> Orders = new List<Order>();
 
             // While we are manually testing, we are going to manually code in the orders, but
@@ -1850,17 +1818,6 @@ namespace BitmexBot
                 this.Text = string.Format("Bitmex bot {0}", version);
             }
 
-            //float widthRatio = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Width / 1280f; //Screen.PrimaryScreen.Bounds.Width / 1280;
-            //float heightRatio = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Height / 800f;//Screen.PrimaryScreen.Bounds.Height / 800f;
-            //SizeF scale = new SizeF(widthRatio, heightRatio);
-
-            //this.Scale(scale);
-
-            //foreach (Control control in this.Controls)
-            //{
-            //    control.Font = new Font("Verdana", control.Font.SizeInPoints * heightRatio * widthRatio);
-            //}
-
             Rectangle resolutionRect = System.Windows.Forms.Screen.FromControl(this).Bounds;
             if (this.Width >= resolutionRect.Width || this.Height >= resolutionRect.Height)
             {
@@ -1872,14 +1829,6 @@ namespace BitmexBot
             InitializeAPI();
             InitializeCandleArea();
             InitializeOverTime();
-
-            //for (int i = 0; i < dgvCandles.Columns.Count; i++)
-            //{
-            //    dgvCandles.Columns[i].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
-            //    int colw = dgvCandles.Columns[i].Width;
-            //    dgvCandles.Columns[i].AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
-            //    dgvCandles.Columns[i].Width = colw;
-            //}
         }
 
         private void btnLeverage_Click(object sender, EventArgs e)
@@ -1889,13 +1838,5 @@ namespace BitmexBot
 
             lblLeverageResult.Text = string.Format("Leverage set to: {0}", leverageResult.Leverage.ToString());
         }
-
-        //private void dgvCandles_SizeChanged(object sender, EventArgs e)
-        //{
-        //    foreach (DataGridViewRow row in dgvCandles.Rows)
-        //    {
-        //        row.Height = (dgvCandles.ClientRectangle.Height - dgvCandles.ColumnHeadersHeight) / dgvCandles.Rows.Count;
-        //    }
-        //}
     }
 }
